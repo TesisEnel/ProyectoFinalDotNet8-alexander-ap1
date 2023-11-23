@@ -7,8 +7,10 @@
 
 <PageTitle>Auth</PageTitle>
 
-<h1>You are authenticated</h1>
+<AuthorizeView Roles ="Admin">
+    <h1>You are authenticated</h1>
+</AuthorizeView>
 
-<AuthorizeView>
+<AuthorizeView >
     Hello @context.User.Identity?.Name!
 </AuthorizeView>

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectoFinalDotNet8", "Pro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectoFinalDotNet8.Client", "ProyectoFinalDotNet8\ProyectoFinalDotNet8.Client\ProyectoFinalDotNet8.Client.csproj", "{F0FE70C4-9DD8-415E-8623-6F2CB551BB7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "ProyectoFinalDotNet8\Shared\Shared.csproj", "{85EFB850-E029-4F69-B2FC-0F2C34417E2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F0FE70C4-9DD8-415E-8623-6F2CB551BB7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0FE70C4-9DD8-415E-8623-6F2CB551BB7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0FE70C4-9DD8-415E-8623-6F2CB551BB7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85EFB850-E029-4F69-B2FC-0F2C34417E2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85EFB850-E029-4F69-B2FC-0F2C34417E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85EFB850-E029-4F69-B2FC-0F2C34417E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85EFB850-E029-4F69-B2FC-0F2C34417E2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
