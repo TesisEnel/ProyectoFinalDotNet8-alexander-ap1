@@ -1,0 +1,378 @@
+﻿@page "/RegistroDespacho"
+@page "/RegistroDespacho/{DespachoId:int}"
+@inject NotificationService notificationService
+@inject HttpClient httpClient
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveAuto
+
+<RadzenNotification />
+<EditForm Model="Despacho" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="row">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Despacho</h1>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <label>Despacho ID:</label>
+                        <div class=" col-auto  mb-3">
+                            <InputNumber @bind-Value="Despacho.DespachoId" class="form-control" min="0"></InputNumber>
+                            <ValidationMessage For="@(() => Despacho.MenuId)" />
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>Fecha: </label>
+                            <InputDate @bind-Value="Despacho.Fecha" class="form-control"></InputDate>
+                            <ValidationMessage For="@(() => Despacho.Fecha)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label> Men&uacute;: </label>
+                            <InputSelect @bind-Value="Despacho.MenuId" class="form-select">
+                                <option value="0" selected>Seleccione</option>
+                                @foreach (var item in Menus)
+                                {
+                                    <option value="@item.MenuId">@item.Descripcion</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Despacho.MenuId)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label> Centros Educativos: </label>
+                            <InputSelect @bind-Value="Despacho.CentroEducativoId" class="form-select">
+                                <option value="0"  selected>Seleccione</option>
+                                @foreach (var item in CentrosEducativos)
+                                {
+                                    <option value="@item.CentroEducativoId">@item.Nombre</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Despacho.CentroEducativoId)" />
+                        </div>
+                    </div>
+                    <br />
+                    <fieldset>
+                        <div class="card-header">
+                            <h3>Comidas a despachar</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label> Comidas: </label>
+                                <InputSelect @bind-Value="DespachoDetalle.ComidaId" class="form-select">
+                                    @foreach (var item in Comidas)
+                                    {
+                                        <option value="@item.ComidaId">@item.Descripcion</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => DespachoDetalle.ComidaId)" />
+
+                                <div class="input-group">
+                                    <InputNumber @bind-Value="DespachoDetalle.CantidadDecomida" class="form-control"></InputNumber>
+                                    <ValidationMessage For="@(() => DespachoDetalle.CantidadDecomida)" />
+                                    <button type="button" class="btn btn-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
+                                </div>
+
+                            </div>
+                            <label>Cantidad</label>
+                            <div class="row">
+                                <div class="col">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="row"
+                                        <div class="col">
+                                            <div class="input-group">
+                                        </div>
+                                     </div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Despacho Id</th>
+                                            <th>Descripci&oacute;n</th>
+                                            <th>Comida Id</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @foreach (var item in this.Despacho.DespachoDetalles)
+                                        {
+                                            <tr>
+                                                <td>@item.DespachoId</td>
+                                                <td>@ObtenerDescripcionComida(item.ComidaId)</td>
+                                                <td>@item.ComidaId</td>
+                                                <td>@item.CantidadDecomida</td>
+                                                <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="oi oi-trash" /></button></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br />
+                </div>
+                <div class="card-footer">
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" @onclick="Nuevo">Nuevo <i class="oi oi-file" /></button>
+                        <button class="btn btn-success">Guardar <i class="oi oi-document" /></button>
+                        <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar <i class="oi oi-trash" /></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int DespachoId { get; set; }
+    public DespachoDetalle DespachoDetalle { get; set; } = new();
+    public Despacho Despacho { get; set; } = new(); //Perner la entidad en plural
+    public List<Comidas> Comidas { get; set; } = new List<Comidas>();
+    public List<CentrosEducativos> CentrosEducativos { get; set; } = new List<CentrosEducativos>();
+    public List<Menu> Menus { get; set; } = new List<Menu>(); //creo que las comidas debo de traerlas del menu y solo incrementar la cantidad o preguntarle a Enel si seria bueno que camias den el detalle se cambien por el menu
+    public List<DespachoDetalle> DetallesEliminados { get; set; } = new();
+    public List<DespachoDetalle> DetallesAgregado { get; set; } = new();
+
+    // public int id = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas");
+        var centrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+        var menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus");
+        if (centrosEducativos.Count > 0 )
+        {
+            CentrosEducativos = centrosEducativos;
+            Despacho.CentroEducativoId = centrosEducativos.First().CentroEducativoId;
+        }
+        if(comidas!.Count > 0)
+        {
+            Comidas = comidas;
+            DespachoDetalle.ComidaId = comidas!.First().ComidaId;
+        }
+        if(menus!.Count > 0)
+        {
+            Menus = menus;
+            Despacho.MenuId = menus.First().MenuId;
+        }
+        if (DespachoId > 0)
+        {
+            Despacho.DespachoId = DespachoId;
+            await Buscar();
+        }
+        Despacho.RecibidoPor = "";
+        DetallesEliminados = new();
+        DetallesAgregado = new();
+        StateHasChanged();
+    }
+
+    public async Task Guardar()
+    {
+        using var response = await httpClient.PostAsJsonAsync("api/Despachoes", Despacho);
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error ",
+                    Detail = "Despacho no guardado",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        var despachoDevuelto = await response.Content.ReadFromJsonAsync<Despacho>();
+        if (despachoDevuelto is not null)
+        {
+            Despacho = despachoDevuelto;
+            if (DetallesEliminados.Count > 0)
+            {
+                foreach (var item in DetallesEliminados)
+                {
+                    await httpClient.DeleteAsync($"api/Despachoes/DeleteDetalles/{item.DetalleId}");
+                    // var disminuir = CentrosEducativos.FirstOrDefault(p => p.ComidaId == item.ComidaId);
+                }
+            }
+
+            if (DetallesAgregado.Count > 0)
+            {
+                foreach (var item in DetallesAgregado)
+                {
+                    using var responseDetalleAgregado = await httpClient.PutAsJsonAsync<DespachoDetalle>($"api/Menus/{item.DetalleId}", item);
+                }
+            }
+
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado ",
+                    Detail = "Despacho guardado",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            Nuevo();
+            StateHasChanged();
+
+        }
+    }
+
+    public void Nuevo()
+    {
+        Despacho = new();
+        @* DespachoDetalle = new(); *@
+        DetallesEliminados = new();
+        DetallesAgregado = new();
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Nuevo ",
+                Detail = "Puedes escribir un nuevo Despacho",
+                Duration = 5_000
+            };
+        notificationService.Notify(mensaje);
+        return;
+    }
+
+    public async Task Buscar()
+    {
+        // DespachoDetalle = new();
+        DetallesAgregado = new();
+        var despachoNotNull = (await httpClient.GetFromJsonAsync<List<Despacho>>($"api/Despachoes"))
+        .ToList().Any(e => e.DespachoId == Despacho.DespachoId);
+        if (despachoNotNull)
+        {
+            var despachoEncontrado = await httpClient.GetFromJsonAsync<Despacho>($"api/Despachoes/{Despacho.DespachoId}");
+            if (despachoEncontrado != null)
+            {
+                Despacho = despachoEncontrado;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error Despacho",
+                    Detail = "Despacho no encontrado",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        using var response = await httpClient.DeleteAsync($"api/Despachoes/{Despacho.DespachoId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Eliminado ",
+                    Detail = "No haz podido eliminar Despacho",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        else
+            Nuevo();
+    }
+
+    public async Task AgregarDetalle()
+    {
+        // if (DespachoDetalle.CantidadDecomida > 0)
+        var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId).CantidadMatricula <= DespachoDetalle.CantidadDecomida;
+        var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
+        var VerificarComida = menuEncotrado.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
+        if (VerificarCantidadComida && VerificarComida)
+        {
+            DespachoDetalle.DespachoId = Despacho.DespachoId;
+            Despacho.DespachoDetalles.Add(DespachoDetalle);
+            DetallesAgregado.Add(DespachoDetalle);
+            DespachoDetalle = new DespachoDetalle();
+            StateHasChanged();
+        }
+        else
+        {
+            if (!VerificarCantidadComida)
+            {
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error ",
+                        Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId).CantidadMatricula} raciones)",
+                        Duration = 5_000
+                    };
+                notificationService.Notify(mensaje);
+            }
+
+            if (!VerificarComida)
+            {
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error ",
+                        Detail = $"{ObtenerDescripcionComida(DespachoDetalle.ComidaId)} no pertenece al menú",
+                        Duration = 5_000
+                    };
+                notificationService.Notify(mensaje);
+            }
+        }
+        StateHasChanged();
+    }
+
+    private async Task<Despacho> BuscarDespacho(int entradasId)
+    {
+        Despacho despacho = new();
+        var despachoEncontrado = await httpClient.GetFromJsonAsync<Despacho>($"api/Despachoes/{entradasId}");
+
+        if (despachoEncontrado != null)
+            return despacho = despachoEncontrado;
+
+        return new Despacho();
+    }
+
+    private async Task RemoveDatalle(DespachoDetalle detalle)
+    {
+        var detalleEncontrado = Despacho.DespachoDetalles.FirstOrDefault(ed => ed.DetalleId == detalle.DetalleId);
+        if (detalleEncontrado != null)
+        {
+            var menus = BuscarDespacho(detalleEncontrado.DespachoId);
+            detalle = detalleEncontrado;
+            DespachoDetalle = detalleEncontrado;
+            DespachoDetalle.ComidaId = detalleEncontrado.ComidaId;
+            Despacho.DespachoDetalles.Remove(detalle);
+            DetallesEliminados.Add(detalleEncontrado);
+        }
+        StateHasChanged();
+
+    }
+
+    public string? ObtenerDescripcionComida(int Id)
+    {
+        var comidas = Comidas.FirstOrDefault(t => t.ComidaId == Id);
+        return comidas?.Descripcion;
+    }
+    public string? ObtenerDescripcionMenu(int Id)
+    {
+        var menus = Menus.FirstOrDefault(t => t.MenuId == Id);
+        return menus?.Descripcion;
+    }
+}

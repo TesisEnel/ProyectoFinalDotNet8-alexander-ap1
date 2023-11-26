@@ -1,0 +1,238 @@
+﻿@rendermode InteractiveAuto
+@attribute [Authorize(Roles = "Admin")]
+@page "/RegistroCentroEducativo"
+@page "/RegistroCentroEducativo/{CentroEducativoId:int}"
+@using Radzen;
+@inject NotificationService notificationService
+@inject HttpClient httpClient
+
+<RadzenNotification />
+<EditForm Model="centroEducativo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="col-7">
+        <div class="card">
+            <div class="card-header">
+                <h1>Registro Centro Educativo</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label>ID:</label>
+                    <div class=" col-auto mb-3">
+                        <InputNumber @bind-Value="centroEducativo.CentroEducativoId" class="form-control" min="0"></InputNumber>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Nombre: </label>
+                        <InputText @bind-Value="centroEducativo.Nombre" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => centroEducativo.Nombre)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Cantidad de Matr&iacutecula:</label>
+                        <InputNumber @bind-Value="centroEducativo.CantidadMatricula" class="form-control" min="0"></InputNumber>
+                        <ValidationMessage For="@(() => centroEducativo.CantidadMatricula)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>C&oacutedigo Regional:</label>
+                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoRegional" @oninput="AsignarDistrito">
+                            <option value="" selected>Seleccione</option>
+                            @foreach (var item in ListRegiones)
+                            {
+                                <option value="@item.CodigoRegional">@item.NombreRegion</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => centroEducativo.CodigoRegional)" />
+                    </div>
+                    <div class="col">
+                        <label>C&oacutedigo Distrital:</label>
+                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoDistrital" @onclick="AsignarRegion" >
+                            <option value="" selected>Seleccione</option>
+                            @foreach (var item in ListDistritos)
+                            {
+                                <option value="@item.CodigoDistrito">@item.NombreDistrital</option>
+                            }                    
+                        </InputSelect>
+                        <ValidationMessage For="@(() => centroEducativo.CodigoDistrital)" />
+                    </div>                    
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Direcci&oacuten:</label>
+                        <InputText @bind-Value="centroEducativo.Direccion" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => centroEducativo.Direccion)" />
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary " @onclick="Nuevo">Nuevo <i class="oi oi-file" /></button>
+                <button class="btn btn-success">Guardar <i class="oi oi-document" /></button>
+                <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar <i class="oi oi-trash" /></button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int CentroEducativoId { get; set; }
+
+    public List<Distritos> ListDistritos { get; set; } = new();
+    public List<Regiones> ListRegiones { get; set; } = new();
+
+    public CentrosEducativos centroEducativo { get; set; } = new CentrosEducativos();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListDistritos = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos");
+        ListRegiones = await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones");
+        if (CentroEducativoId > 0)
+        {
+            centroEducativo.CentroEducativoId = CentroEducativoId;
+            await Buscar();
+        }
+        StateHasChanged();
+    }
+
+    void Nuevo()
+    {
+        centroEducativo = new CentrosEducativos();
+
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Nuevo Centro Educativo",
+                Detail = "Puedes ingresar un nuevo centro educativo.",
+                Duration = 5000
+            };
+        notificationService.Notify(mensaje);
+    }
+
+    private void StateHasChanged()
+    {
+        InvokeAsync(() => base.StateHasChanged());
+    }
+    public async Task Buscar()
+    {
+        var centroEducativoEncontrado = await httpClient.GetFromJsonAsync<CentrosEducativos>($"api/CentrosEducativos/{centroEducativo.CentroEducativoId}");
+        if (centroEducativoEncontrado != null)
+        {
+            centroEducativo = centroEducativoEncontrado;
+            StateHasChanged();
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error Centro Educativo",
+                    Detail = "Centro educativo no encontrado",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public async Task Guardar()
+    {             
+        using var response  = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);      
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Centro educativo no guardado",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+
+        var centroEducativoDevuelto = await response.Content.ReadFromJsonAsync<CentrosEducativos>();
+        if (centroEducativoDevuelto != null)
+        {
+            centroEducativo = centroEducativoDevuelto;
+            StateHasChanged();
+            Nuevo();
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado",
+                    Detail = "Centro educativo guardado",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        if (centroEducativo.CentroEducativoId > 0)
+        {
+            var response = await httpClient.DeleteAsync($"api/CentrosEducativos/{centroEducativo.CentroEducativoId}");
+            if (response.IsSuccessStatusCode)
+            {
+                Nuevo();
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Eliminado",
+                        Detail = "Centro educativo eliminado con éxito",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+            }
+            else
+            {
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No se pudo eliminar el centro educativo",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+            }
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Advertencia",
+                    Detail = "El centro educativo no tiene ID válido para ser eliminado",
+                    Duration = 5000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+    public void AsignarRegion()
+    {
+        if (!string.IsNullOrEmpty(centroEducativo.CodigoDistrital))
+        {            
+            centroEducativo.CodigoRegional = ListDistritos
+            .FirstOrDefault(d => d.CodigoDistrito == centroEducativo.CodigoDistrital)?.CodigoRegional;
+            StateHasChanged();
+        }
+    }
+    public async Task AsignarDistrito()
+    {
+        var listDistritoTemporal = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos");
+        if (!string.IsNullOrEmpty(centroEducativo.CodigoRegional))
+        {
+            ListDistritos = listDistritoTemporal!.Where(d => d.CodigoRegional == centroEducativo.CodigoRegional).ToList();
+        }
+        else
+        {
+            ListDistritos = listDistritoTemporal!;
+        }
+    }
+}

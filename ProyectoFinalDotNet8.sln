@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectoFinalDotNet8", "ProyectoFinalDotNet8\ProyectoFinalDotNet8\ProyectoFinalDotNet8.csproj", "{36242610-FF57-4822-BF19-89573EF54EDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProyectoFinalDotNet8", "ProyectoFinalDotNet8\ProyectoFinalDotNet8\ProyectoFinalDotNet8.csproj", "{36242610-FF57-4822-BF19-89573EF54EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectoFinalDotNet8.Client", "ProyectoFinalDotNet8\ProyectoFinalDotNet8.Client\ProyectoFinalDotNet8.Client.csproj", "{F0FE70C4-9DD8-415E-8623-6F2CB551BB7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProyectoFinalDotNet8.Client", "ProyectoFinalDotNet8\ProyectoFinalDotNet8.Client\ProyectoFinalDotNet8.Client.csproj", "{F0FE70C4-9DD8-415E-8623-6F2CB551BB7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "ProyectoFinalDotNet8\Shared\Shared.csproj", "{85EFB850-E029-4F69-B2FC-0F2C34417E2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "ProyectoFinalDotNet8\Shared\Shared.csproj", "{85EFB850-E029-4F69-B2FC-0F2C34417E2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

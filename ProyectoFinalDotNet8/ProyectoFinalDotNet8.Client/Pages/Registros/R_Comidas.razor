@@ -1,0 +1,169 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Shared.Models
+@rendermode InteractiveAuto
+@page "/RegistroComida"
+@page "/RegistroComida/{ComidaId:int}"
+@inject NotificationService notificationService
+@inject HttpClient httpClient
+@attribute [Authorize(Roles = "Admin")]
+<RadzenNotification />
+<EditForm Model="Comidas" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="col-7">
+        <div class="card">
+            <div class="card-header">
+                <h1>Registro Comidas</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label>ID:</label>
+                    <div class=" col-auto mb-3">
+                        <InputNumber @bind-Value="Comidas.ComidaId" class="form-control" min="0"></InputNumber>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Descripci&oacute;n: </label>
+                        <InputText @bind-Value="Comidas.Descripcion" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => Comidas.Descripcion)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Tipo de comida: </label>
+                        <InputSelect @bind-Value="Comidas.TipoComidaId" class="form-select">
+                            <option value="0">Seleccione</option>
+
+                            @foreach (var item in Tipos)
+                            {                              
+                               <option value="@item.TipoComidaId">@item.Tipo</option>                               
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Comidas.TipoComidaId)" />
+                    </div>
+                </div>               
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary " @onclick="Nuevo">Nuevo <i class="oi oi-file" /></button>
+                <button class="btn btn-success">Guardar <i class="oi oi-document" /></button>
+                <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar <i class="oi oi-trash" /></button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int ComidaId { get; set; }
+    [SupplyParameterFromForm]
+    public Comidas Comidas { get; set; } = new Comidas();
+
+    public List<TiposComidas> Tipos { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tipos = await httpClient.GetFromJsonAsync<List<TiposComidas>>("api/TiposComidas")?? new List<TiposComidas>();
+        if (ComidaId > 0)
+        {
+            Comidas.ComidaId = ComidaId;
+            await Buscar();
+        }
+        StateHasChanged();
+    }
+
+    public async Task Buscar()
+    {
+        var clienteNotNull = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/comidas"))!.ToList().Any(c => c.ComidaId == Comidas.ComidaId);
+        if (clienteNotNull)
+        {
+            var clienteEncotrado = await httpClient.GetFromJsonAsync<Comidas>($"api/comidas/{Comidas.ComidaId}");
+            if (clienteEncotrado != null)
+            {
+                this.Comidas = clienteEncotrado;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error ",
+                    Detail = "Comida no encontrada",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    void Nuevo()
+    {
+        this.Comidas = new ();
+
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Nuevo ",
+                Detail = "Puedes escribir una nueva comida",
+                Duration = 5_000
+            };
+        notificationService.Notify(mensaje);
+
+        return;
+    }
+
+    public async Task Guardar()
+    {
+        using var response = await httpClient.PostAsJsonAsync("api/comidas", Comidas);
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error ",
+                    Detail = "Comida no guardada",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        var clienteDevuelto = await response.Content.ReadFromJsonAsync<Comidas>();
+        if (clienteDevuelto is not null)
+        {
+            Comidas = clienteDevuelto;
+            StateHasChanged();
+            Nuevo();
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado ",
+                    Detail = "Comida guardada",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        using var response = await httpClient.DeleteAsync($"api/comidas/{Comidas.ComidaId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Eliminado ",
+                    Detail = "Haz podido eliminar la comida con exito",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        else
+            Nuevo();
+    }
+}

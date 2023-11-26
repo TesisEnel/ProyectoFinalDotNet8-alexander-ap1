@@ -1,0 +1,297 @@
+﻿@page "/RegistroMenu"
+@page "/RegistroMenu/{MenuId:int}"
+@inject NotificationService notificationService
+@inject HttpClient httpClient
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveAuto
+
+<EditForm Model="Menu" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="row">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Men&uacute;</h1>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <label>Descripci&oacute;n: </label>
+                            <InputText @bind-Value="Menu.Descripcion" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => Menu.Descripcion)" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>D&iacute;a semana:</label>
+                            <InputSelect @bind-Value="Menu.DiaSemana" class="form-select">
+                                <option value="" selected>Seleccione un d&iacute;a</option>
+                                <option value="Lunes" >Lunes</option>
+                                <option value="Martes">Martes</option>
+                                <option value="Mi&eacute;rcoles">Mi&eacute;rcoles</option>
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Menu.DiaSemana)" />
+                        </div>
+                    </div>
+
+                        <br />                  
+                        <fieldset>
+                            <div class="card-header">
+                                <h3>Comidas del men&uacute;</h3>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label> Comidas: </label>
+                                    <InputSelect @bind-Value="MenuDetalle.ComidaId" class="form-select">
+                                    <option value="0">Seleccione</option>
+                                    @foreach (var item in Comidas)
+                                        {
+                                            <option value="@item.ComidaId">@item.Descripcion</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => MenuDetalle.DetalleId)" />
+                                </div>
+                                <div class="col-md-5">
+                                    <label>Cantidad</label>
+                                     <div class="row"
+                                        <div class="col">
+                                            <div class="input-group">
+                                            <button type="button" class="btn btn-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
+                                        </div>
+                                     </div>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Comida Id</th>
+                                                <th>Descripci&oacute;n</th>
+                                                <th>Menu Id</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                             @foreach (var item in this.Menu.MenuDetalles)
+                                            {
+                                                <tr>
+                                                    <td>@item.ComidaId</td>
+                                                    <td>@ObtenerDescripcion(item.ComidaId)</td>
+                                                    <td>@item.MenuId</td>
+                                                    <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="oi oi-trash" /></button></td>
+                                                </tr>
+                                            } 
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>                            
+                        </fieldset>                   
+                    <br />
+                </div>
+                <div class="card-footer">
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" @onclick="Nuevo">Nuevo <i class="oi oi-file" /></button>
+                        <button class="btn btn-success">Guardar <i class="oi oi-document" /></button>
+                        <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar <i class="oi oi-trash" /></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int MenuId { get; set; }
+    public MenuDetalles MenuDetalle { get; set; } = new();
+    public Menu Menu { get; set; } = new(); //Perner la entidad en plural
+    public List<Comidas> Comidas { get; set; } = new List<Comidas>();
+    public List<MenuDetalles> DetallesEliminados { get; set; } = new();
+    public List<MenuDetalles> DetallesAgregado { get; set; } = new();
+
+    // public int id = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas");
+        if (comidas is not null)
+        {
+            Comidas = comidas;
+            // EntredasDetalle.ProductoId = comidas.First().ProductoId;
+        }
+        if (MenuId > 0)
+        {
+            Menu.MenuId = MenuId;
+            await Buscar();
+        }
+        DetallesEliminados = new();
+        DetallesAgregado = new();
+        StateHasChanged();
+    }
+
+    public async Task Guardar()
+    {
+        using var response = await httpClient.PostAsJsonAsync("api/Menus", Menu);
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error ",
+                    Detail = "Menú no guardada",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        var menusDevuelto = await response.Content.ReadFromJsonAsync<Menu>();
+        if (menusDevuelto is not null)
+        {
+            Menu = menusDevuelto;
+            if (DetallesEliminados.Count > 0)
+            {
+                foreach (var item in DetallesEliminados)
+                {
+                    await httpClient.DeleteAsync($"api/Menus/DeleteDetalles/{item.DetalleId}");
+                    var disminuir = Comidas.FirstOrDefault(p => p.ComidaId == item.ComidaId);             
+                }
+            }
+
+            if (DetallesAgregado.Count > 0)
+            {
+                foreach (var item in DetallesAgregado)
+                {
+                    using var responseDetalleAgregado = await httpClient.PutAsJsonAsync<MenuDetalles>($"api/MenuDetalles/{item.DetalleId}", item);
+                }
+            }
+
+            StateHasChanged();
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado ",
+                    Detail = "Menú guardado",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            Nuevo();
+        }
+    }
+
+    public void Nuevo()
+    {
+        Menu = new();
+        MenuDetalle = new();
+        DetallesEliminados = new();
+        DetallesAgregado = new();
+        var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Nuevo ",
+                Detail = "Puedes escribir un nuevo Menú",
+                Duration = 5_000
+            };
+        notificationService.Notify(mensaje);
+        return;
+    }
+
+    public async Task Buscar()
+    {
+        MenuDetalle = new();
+        DetallesAgregado = new();
+        var menuNotNull = (await httpClient.GetFromJsonAsync<List<Menu>>($"api/Menus"))
+        .ToList().Any(e => e.MenuId == Menu.MenuId);
+        if (menuNotNull)
+        {
+            var menuEncontrado = await httpClient.GetFromJsonAsync<Menu>($"api/Menus/{Menu.MenuId}");
+            if (menuEncontrado != null)
+            {
+                Menu = menuEncontrado;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error Menú",
+                    Detail = "Menú no encontrado",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        using var response = await httpClient.DeleteAsync($"api/Menus/{Menu.MenuId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Eliminado ",
+                    Detail = "No haz podido eliminar Menú",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+            return;
+        }
+        else
+            Nuevo();
+    }
+
+    public async Task AgregarDetalle()
+    {
+        if (MenuDetalle.ComidaId > 0)
+        {
+            MenuDetalle.MenuId = Menu.MenuId;
+            Menu.MenuDetalles.Add(MenuDetalle);
+            DetallesAgregado.Add(MenuDetalle);
+            MenuDetalle = new MenuDetalles();
+            StateHasChanged();
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error ",
+                    Detail = "Debes de eligir una comida",
+                    Duration = 5_000
+                };
+            notificationService.Notify(mensaje);
+        }
+        StateHasChanged();
+    }
+
+    private async Task<Menu> BuscarMenu(int entradasId)
+    {
+        Menu menus = new();
+        var entradasEncontrada = await httpClient.GetFromJsonAsync<Menu>($"api/Menus/{entradasId}");
+
+        if (entradasEncontrada != null)
+            return menus = entradasEncontrada;
+
+        return new Menu();
+    }
+
+    private async Task RemoveDatalle(MenuDetalles detalle)
+    {
+        MenuDetalle = detalle;
+        Menu.MenuDetalles.Remove(detalle);
+        DetallesEliminados.Add(detalle);    
+        StateHasChanged();
+    }
+
+    public string? ObtenerDescripcion(int Id)
+    {
+        var productos = Comidas.FirstOrDefault(t => t.ComidaId == Id);
+        return productos.Descripcion;
+    }
+}

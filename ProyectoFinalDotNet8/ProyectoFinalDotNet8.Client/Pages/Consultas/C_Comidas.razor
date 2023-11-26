@@ -1,0 +1,174 @@
+﻿@page "/ConsultaComida"
+@inject HttpClient httpClient
+@rendermode InteractiveAuto
+@attribute [Authorize]
+
+<div>
+    <div class="row justify-content-start ">
+        <div class=" col-sm-10 col-md-9 col-lg-10 col-xl-xxl-7 ">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Consulta Comidas</h1>
+                    <div class="row">
+                        <div class="row">
+                            <label>filtrar por</label>
+                            <div class="col">
+                                <InputSelect class="form-select" @bind-Value="opciones">
+                                    <option value="0" selected>ID</option>
+                                    <option value="1">Descripci&oacute;n</option>
+                                    <option value="2">Id Tipo Comida</option>
+                                    <option value="3">Tipo Comida</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col input-group">
+                                <button class="form-control oi oi-magnifying-glass" type="button" @onclick="Buscar"></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+
+                                @switch (opciones)
+                                {
+                                    case 0:
+                                        <InputNumber class="form-control" @bind-Value="ComidaAuxiliar.ComidaId" min="0"></InputNumber>
+                                        break;
+                                    case 1:
+                                        <InputText class="form-control" @bind-Value="ComidaAuxiliar.Descripcion"></InputText>
+                                        break;
+                                    case 2:
+                                        <InputNumber class="form-control" @bind-Value="ComidaAuxiliar.TipoComidaId" min="0"></InputNumber>
+                                        break;
+                                    case 3:
+                                        <InputSelect @bind-Value="ComidaAuxiliar.TipoComidaId" class="form-select">
+                                            <option value="0"> Seleccione</option>
+                                            @foreach (var item in Tipos)
+                                            {
+                                                <option value="@item.TipoComidaId">@item.Tipo</option>
+                                            }
+                                        </InputSelect>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive ">
+                        <table border="1" class="table table-bordered table-striped ">
+                            <thead>
+                                <tr class="table-secondary">
+                                    <th>Id Comida</th>
+                                    <th>Descripci&oacute;n</th>
+                                    <th>Id Tipo de comida</th>
+                                    <th>Ver</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var tabla in Comidas)
+                                {
+                                    <tr>
+                                        <td>@tabla.ComidaId</td>
+                                        <td>@tabla.Descripcion</td>
+                                        <td>@tabla.TipoComidaId</td>
+                                        <td><a href="RegistroComida/@tabla.ComidaId">ver</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <span>Conteo: @Conteo</span>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Comidas> Comidas { get; set; } = new List<Comidas>();
+
+    public int ID { get; set; }
+
+    public int Conteo;
+
+    public int opciones;
+    public DateTime Desde { get; set; }
+    public DateTime Hasta { get; set; }
+    public Comidas ComidaAuxiliar = new();
+    public List<TiposComidas> Tipos { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        Tipos = await httpClient.GetFromJsonAsync<List<TiposComidas>>("api/TiposComidas")?? new List<TiposComidas>()?? new List<TiposComidas>();
+        Desde = DateTime.Now.AddMonths(-1);
+        Hasta = DateTime.Now;
+        Buscar();
+    }
+
+    public async Task Buscar()
+    {
+
+        switch (opciones)
+        {
+            case 0:
+                if (ComidaAuxiliar.ComidaId == 0)
+                {
+                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    StateHasChanged();
+                }
+                else
+                {
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(c => c.ComidaId == ComidaAuxiliar.ComidaId).ToList();
+                    StateHasChanged();
+                }
+                break;
+
+            case 1:
+                if (string.IsNullOrEmpty(ComidaAuxiliar.Descripcion))
+                {
+                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    StateHasChanged();
+                }
+                else
+                {
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(t => t.Descripcion
+                        .Contains(ComidaAuxiliar.Descripcion, StringComparison.OrdinalIgnoreCase)).ToList();
+                    StateHasChanged();
+                }
+                break;
+
+            case 2:
+                if (ComidaAuxiliar.TipoComidaId == 0)
+                {
+                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    StateHasChanged();
+                }
+                else
+                {
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
+                    StateHasChanged();
+                }
+                break;
+            case 3:
+                if (ComidaAuxiliar.TipoComidaId == 0)
+                {
+                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    StateHasChanged();
+                }
+                else
+                {
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
+                    StateHasChanged();
+                }
+                break;
+        }
+        Conteo = Comidas != null ? Comidas!.Count() : 0;
+    }
+    public string? ObtenerDescripcionTipoComida(int id)
+    {
+        var tipoComida = Tipos.FirstOrDefault(t => t.TipoComidaId == id);
+        return tipoComida?.Tipo;
+    }
+}

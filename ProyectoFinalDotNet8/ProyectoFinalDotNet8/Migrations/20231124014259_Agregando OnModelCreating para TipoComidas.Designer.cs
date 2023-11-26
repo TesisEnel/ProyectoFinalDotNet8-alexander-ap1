@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalDotNet8.Data;
 
@@ -10,9 +11,11 @@ using ProyectoFinalDotNet8.Data;
 namespace ProyectoFinalDotNet8.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231124014259_Agregando OnModelCreating para TipoComidas")]
+    partial class AgregandoOnModelCreatingparaTipoComidas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -335,36 +338,6 @@ namespace ProyectoFinalDotNet8.Migrations
                     b.HasKey("DistritoId");
 
                     b.ToTable("Distritos");
-
-                    b.HasData(
-                        new
-                        {
-                            DistritoId = 1,
-                            CodigoDistrito = "01",
-                            CodigoRegional = "06",
-                            NombreDistrital = "José Contreras"
-                        },
-                        new
-                        {
-                            DistritoId = 2,
-                            CodigoDistrito = "02",
-                            CodigoRegional = "06",
-                            NombreDistrital = "Constanza"
-                        },
-                        new
-                        {
-                            DistritoId = 3,
-                            CodigoDistrito = "03",
-                            CodigoRegional = "07",
-                            NombreDistrital = "Villa Riva"
-                        },
-                        new
-                        {
-                            DistritoId = 4,
-                            CodigoDistrito = "04",
-                            CodigoRegional = "07",
-                            NombreDistrital = "Tenares"
-                        });
                 });
 
             modelBuilder.Entity("Shared.Models.Menu", b =>
@@ -422,20 +395,6 @@ namespace ProyectoFinalDotNet8.Migrations
                     b.HasKey("RegionId");
 
                     b.ToTable("Regiones");
-
-                    b.HasData(
-                        new
-                        {
-                            RegionId = 1,
-                            CodigoRegional = "06",
-                            NombreRegion = "La Vega"
-                        },
-                        new
-                        {
-                            RegionId = 2,
-                            CodigoRegional = "07",
-                            NombreRegion = "San Francisco de Macorís"
-                        });
                 });
 
             modelBuilder.Entity("Shared.Models.TiposComidas", b =>

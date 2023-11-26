@@ -1,0 +1,203 @@
+﻿@rendermode InteractiveAuto
+@page "/ConsultaCentroEducativo"
+@inject HttpClient httpClient
+@attribute [Authorize]
+
+<div>
+    <div class="row justify-content-start ">
+        <div class=" col-sm-10 col-md-9 col-lg-10 col-xl-xxl-7 ">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Consulta Centro Educativo</h1>
+                    <div class="row">
+                        <div class="row">
+                            <label>filtrar por</label>
+                            <div class="col">
+                                <InputSelect class="form-select" @bind-Value="opciones">
+                                    <option value="0" selected>ID</option>
+                                    <option value="1">Nombre</option>
+                                    <option value="2">Cantidad de Matrícula</option>
+                                    <option value="3">Código Distrital</option>
+                                    <option value="4">Código Regional</option>
+                                    <option value="5">Dirección</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col input-group">
+                                <button class="form-control oi oi-magnifying-glass" type="button" @onclick="Buscar"></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                @switch (opciones)
+                                {
+                                    case 0:
+                                        <InputNumber class="form-control" @bind-Value="CentroEducativoAuxiliar.CentroEducativoId"></InputNumber>
+                                        break;
+                                    case 1:
+                                        <InputText class="form-control" @bind-Value="CentroEducativoAuxiliar.Nombre"></InputText>
+                                        break;
+                                    case 2:
+                                        <InputNumber class="form-control" @bind-Value="CentroEducativoAuxiliar.CantidadMatricula"></InputNumber>
+                                        break;
+                                    case 3:
+                                        <InputSelect class="form-select" @bind-Value="CentroEducativoAuxiliar.CodigoDistrital">
+                                            <option value="" selected>Seleccione</option>
+                                            @foreach (var item in ListDistritos)
+                                            {
+                                                <option value="@item.CodigoDistrito">@item.NombreDistrital</option>
+                                            }
+                                        </InputSelect>
+                                        break;
+                                    case 4:
+                                        <InputSelect class="form-select" @bind-Value="CentroEducativoAuxiliar.CodigoRegional">
+                                            <option value="" selected>Seleccione</option>
+                                            @foreach (var item in ListRegiones)
+                                            {
+                                                <option value="@item.CodigoRegional">@item.NombreRegion</option>
+                                            }
+                                        </InputSelect>
+                                        break;
+                                    case 5:
+                                        <InputText class="form-control" @bind-Value="CentroEducativoAuxiliar.Direccion"></InputText>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive ">
+                        <table border="1" class="table table-bordered table-striped ">
+                            <thead>
+                                <tr class="table-secondary">
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Cantidad de Matr&iacutecula</th>
+                                    <th>C&oacutedigo Distrital</th>
+                                    <th>C&oacutedigo Regional</th>
+                                    <th>Direcci&oacute;n</th>                                  
+                                    <th>Ver</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var centroEducativo in CentrosEducativos)
+                                {
+                                    <tr>
+                                        <td>@centroEducativo.CentroEducativoId</td>
+                                        <td>@centroEducativo.Nombre</td>
+                                        <td>@centroEducativo.CantidadMatricula</td>
+                                        <td>@centroEducativo.CodigoDistrital</td>
+                                        <td>@centroEducativo.CodigoRegional</td>
+                                        <td>@centroEducativo.Direccion</td>
+                                        <td><a href="RegistroCentroEducativo/@centroEducativo.CentroEducativoId">ver</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <span>Conteo: @Conteo</span>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<CentrosEducativos> CentrosEducativos { get; set; } = new List<CentrosEducativos>();
+
+    public int Conteo;
+    public int opciones;
+    public CentrosEducativos CentroEducativoAuxiliar = new CentrosEducativos();
+    public List<Distritos> ListDistritos { get; set; } = new();
+    public List<Regiones> ListRegiones { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListDistritos = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos")?? new List<Distritos>();
+        ListRegiones = await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones")?? new List<Regiones>();
+    }
+
+    public async Task Buscar()
+    {
+        switch (opciones)
+        {
+            case 0:
+                if (CentroEducativoAuxiliar.CentroEducativoId == 0)
+                {
+                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                }
+                else
+                {
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                        .Where(c => c.CentroEducativoId == CentroEducativoAuxiliar.CentroEducativoId).ToList();
+                }
+                break;
+
+            case 1:
+                if (string.IsNullOrEmpty(CentroEducativoAuxiliar.Nombre))
+                {
+                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                }
+                else
+                {
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                        .Where(c => c.Nombre.Contains(CentroEducativoAuxiliar.Nombre, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+                break;
+
+            case 2: 
+                if (CentroEducativoAuxiliar.CantidadMatricula <= 0)
+                {
+                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                }
+                else
+                {
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                        .Where(c => c.CantidadMatricula == CentroEducativoAuxiliar.CantidadMatricula).ToList();
+                }
+                break;
+
+            case 3: 
+                if (string.IsNullOrEmpty(CentroEducativoAuxiliar.CodigoDistrital))
+                {
+                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                }
+                else
+                {
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
+                        .Where(c => c.CodigoDistrital == CentroEducativoAuxiliar.CodigoDistrital).ToList();
+                }
+                break;
+
+            case 4: 
+                if (string.IsNullOrEmpty(CentroEducativoAuxiliar.CodigoRegional))
+                {
+                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                }
+                else
+                {
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                        .Where(c => c.CodigoRegional ==CentroEducativoAuxiliar.CodigoRegional).ToList();
+                }
+                break;
+
+            case 5:
+                if (string.IsNullOrEmpty(CentroEducativoAuxiliar.Direccion))
+                {
+                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                }
+                else
+                {
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                        .Where(c => c.Direccion.Contains(CentroEducativoAuxiliar.Direccion, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+                break;
+        }
+
+        Conteo = CentrosEducativos != null ?  CentrosEducativos.Count : 0;
+    }
+}
