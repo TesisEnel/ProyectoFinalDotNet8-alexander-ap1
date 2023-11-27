@@ -1,6 +1,9 @@
 ﻿@page "/weather"
+@using Radzen
+@using Shared.Models
 @attribute [StreamRendering]
-
+@inject HttpClient httpClient
+@inject NotificationService notificationService
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
@@ -32,6 +35,14 @@ else
                     <td>@forecast.Summary</td>
                 </tr>
             }
+            @foreach (var forecast in Tipos)
+            {
+                <tr>
+                    <td>@forecast.TipoComidaId</td>
+                    <td>@forecast.Tipo</td>
+                    
+                </tr>
+            }
         </tbody>
     </table>
 }
@@ -39,8 +50,26 @@ else
 @code {
     private WeatherForecast[]? forecasts;
 
+    public List<TiposComidas> Tipos { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
+        var tip = await httpClient.GetFromJsonAsync<List<TiposComidas>>("api/TiposComidas");
+        if(tip != null)
+        {
+            Tipos = tip;
+        }
+        else
+        {
+            var mensaje = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error Tipos Comidas",
+                Detail = "Tipos Comidas no encontrado",
+                Duration = 5000
+            };
+            notificationService.Notify(mensaje);
+        }
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
 

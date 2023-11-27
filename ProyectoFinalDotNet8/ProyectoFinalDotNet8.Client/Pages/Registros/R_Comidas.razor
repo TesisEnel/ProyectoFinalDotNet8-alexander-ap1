@@ -6,6 +6,8 @@
 @inject NotificationService notificationService
 @inject HttpClient httpClient
 @attribute [Authorize(Roles = "Admin")]
+
+
 <RadzenNotification />
 <EditForm Model="Comidas" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
