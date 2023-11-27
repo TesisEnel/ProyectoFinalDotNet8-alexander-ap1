@@ -39,8 +39,12 @@ namespace ProyectoFinalDotNet8.Controllers
                 return NotFound();
             }
 
+            //_context.Users.ToList();
+
             return centrosEducativos;
         }
+
+
 
         // PUT: api/CentrosEducativos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

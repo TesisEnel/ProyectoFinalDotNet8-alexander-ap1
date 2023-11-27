@@ -53,6 +53,15 @@
                                     </InputSelect>
                                     <ValidationMessage For="@(() => MenuDetalle.DetalleId)" />
                                 </div>
+                                <div class="row">
+                                    <div class="col">
+
+                                        <label class="form-label" for="Foto"><i class="oi oi-puzzle-piece" /> Foto:</label>
+                                        <InputFile OnChange="CargarImagen" class="form-control" accept=".png, .jpg, .jpeg" />
+                                        <ValidationMessage For="@(() => Menu.Imagen)" />
+
+                                    </div>
+                                </div>
                                 <div class="col-md-5">
                                     <label>Cantidad</label>
                                      <div class="row"
@@ -203,7 +212,7 @@
     {
         MenuDetalle = new();
         DetallesAgregado = new();
-        var menuNotNull = (await httpClient.GetFromJsonAsync<List<Menu>>($"api/Menus"))
+        var menuNotNull = (await httpClient.GetFromJsonAsync<List<Menu>>($"api/Menus"))!
         .ToList().Any(e => e.MenuId == Menu.MenuId);
         if (menuNotNull)
         {
@@ -287,6 +296,15 @@
         Menu.MenuDetalles.Remove(detalle);
         DetallesEliminados.Add(detalle);    
         StateHasChanged();
+    }
+
+    private async Task CargarImagen(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+        var buffer = new byte[archivo.Size];
+
+        await archivo.OpenReadStream().ReadAsync(buffer);
+        Menu.Imagen = buffer;
     }
 
     public string? ObtenerDescripcion(int Id)

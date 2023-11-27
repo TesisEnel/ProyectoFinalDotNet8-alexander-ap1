@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalDotNet8.Data;
 
@@ -10,9 +11,11 @@ using ProyectoFinalDotNet8.Data;
 namespace ProyectoFinalDotNet8.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231126154924_Agregando comentarios")]
+    partial class Agregandocomentarios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -414,9 +417,6 @@ namespace ProyectoFinalDotNet8.Migrations
                     b.Property<string>("DiaSemana")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("Imagen")
-                        .HasColumnType("BLOB");
 
                     b.HasKey("MenuId");
 

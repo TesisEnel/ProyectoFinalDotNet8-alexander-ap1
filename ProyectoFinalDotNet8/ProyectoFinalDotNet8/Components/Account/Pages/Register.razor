@@ -28,6 +28,16 @@
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
             <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Nombre" class="form-control"  aria-required="true" placeholder="Juan" />
+                <label for="name">Nombre</label>
+                <ValidationMessage For="() => Input.Nombre" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Apellidos" class="form-control"  aria-required="true" placeholder="Perez Rodriguez" />
+                <label for="lastName">Apellidos</label>
+                <ValidationMessage For="() => Input.Apellidos" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label for="email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
@@ -127,6 +137,14 @@
     private sealed class InputModel
     {
         [Required]
+        [Display(Name = "Nombre")]
+        public string Nombre { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Apellidos")]
+        public string Apellidos { get; set; } = "";
+
+        [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
@@ -134,12 +152,12 @@
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Contraseña")]
         public string Password { get; set; } = "";
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Confirmar contraseña")]
+        [Compare("Password", ErrorMessage = "La contraseña y la contraseña de confirmacion no coinciden.")]
         public string ConfirmPassword { get; set; } = "";
     }
 }

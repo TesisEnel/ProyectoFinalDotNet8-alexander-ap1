@@ -15,6 +15,7 @@ namespace ProyectoFinalDotNet8.Data
         public DbSet<TiposComidas> TiposComidas { get; set; }
         public DbSet<DespachoDetalle> DespachoDetalles { get; set; }
         public DbSet<Regiones> Regiones { get; set; }
+        public DbSet<Comentarios> Comentarios { get; set; }
         public DbSet<Distritos> Distritos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
