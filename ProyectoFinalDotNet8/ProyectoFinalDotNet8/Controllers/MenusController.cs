@@ -25,14 +25,24 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Menu>>> GetMenus()
         {
-            return await _context.Menus.ToListAsync();
+            if (_context.Menus == null)
+            {
+                return NotFound();
+            }
+            return await _context.Menus.Include(m => m.MenuDetalles).Include(m => m.ComenentarioDetalle).ToListAsync();
         }
 
         // GET: api/Menus/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Menu>> GetMenu(int id)
         {
-            var menu = await _context.Menus.FindAsync(id);
+            if (_context.Menus == null)
+            {
+                return NotFound();
+            }
+            var menu = await _context.Menus.Include(m => m.MenuDetalles).Include(m => m.ComenentarioDetalle)
+                .Where(m => m.MenuId == id)
+                .FirstOrDefaultAsync();
 
             if (menu == null)
             {
@@ -78,10 +88,14 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpPost]
         public async Task<ActionResult<Menu>> PostMenu(Menu menu)
         {
-            _context.Menus.Add(menu);
+            if (!MenuExists(menu.MenuId))
+                _context.Menus.Add(menu);
+            else
+                _context.Menus.Update(menu);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMenu", new { id = menu.MenuId }, menu);
+            return Ok(menu);
         }
 
         // DELETE: api/Menus/5
@@ -104,5 +118,15 @@ namespace ProyectoFinalDotNet8.Controllers
         {
             return _context.Menus.Any(e => e.MenuId == id);
         }
+        [HttpGet("Comentarios")]
+        public async Task<ActionResult<IEnumerable<Comentarios>>> GetComentarios()
+        {
+            if (_context.Comentarios == null)
+            {
+                return NotFound();
+            }
+            return await _context.Comentarios.ToListAsync();
+        }
     }
+
 }

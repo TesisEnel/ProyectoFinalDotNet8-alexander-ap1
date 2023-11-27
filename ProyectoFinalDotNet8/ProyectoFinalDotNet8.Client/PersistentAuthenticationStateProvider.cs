@@ -30,6 +30,8 @@ namespace ProyectoFinalDotNet8.Client
                 new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
                 new Claim(ClaimTypes.Name, userInfo.Email),
                 new Claim(ClaimTypes.Email, userInfo.Email),
+                new Claim(ClaimTypes.GivenName, userInfo.Nombre),
+                new Claim(ClaimTypes.Surname, userInfo.Apellidos),
                 new Claim(ClaimTypes.Role, userInfo.Role)
                 ];
 

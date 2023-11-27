@@ -97,8 +97,11 @@ namespace ProyectoFinalDotNet8.Components.Account
                     {
                         UserId = userId,
                         Email = email,
-                        Role = role
-                    });
+                        Role = role,
+                        Nombre = nombre!,
+                        Apellidos = string.Empty
+
+                    }) ;
                 }
             }
         }
