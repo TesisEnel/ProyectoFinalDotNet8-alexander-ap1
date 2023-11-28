@@ -80,8 +80,10 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <span>Conteo: @Conteo</span>
-                                </tr>
+                                    <th>
+                                        Conteo: @Conteo
+                                    </th>
+                                </tr>                                
                             </tfoot>
                         </table>
                     </div>
@@ -101,63 +103,70 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus");
+        Menus = (await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus"))!;
         CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos")?? new List<CentrosEducativos>();
 
     }
 
     public async Task Buscar()
     {
-        switch (opciones)
+        try
         {
-            case 0:
-                if (DespachoAuxiliar.DespachoId == 0)
-                {
-                    Despachos = await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes");
-                }
-                else
-                {
-                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes"))
-                        .Where(d => d.DespachoId == DespachoAuxiliar.DespachoId).ToList();
-                }
-                break;
+            switch (opciones)
+            {
+                case 0:
+                    if (DespachoAuxiliar.DespachoId == 0)
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+                    }
+                    else
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.DespachoId == DespachoAuxiliar.DespachoId).ToList();
+                    }
+                    break;
 
-            case 1:
-                if (DespachoAuxiliar.Fecha == DateTime.MinValue)
-                {
-                    Despachos = await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes");
-                }
-                else
-                {
-                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes"))
-                        .Where(d => d.Fecha.Date == DespachoAuxiliar.Fecha.Date).ToList();
-                }
-                break;
+                case 1:
+                    if (DespachoAuxiliar.Fecha == DateTime.MinValue)
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+                    }
+                    else
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.Fecha.Date == DespachoAuxiliar.Fecha.Date).ToList();
+                    }
+                    break;
 
-            case 2:
-                if (DespachoAuxiliar.MenuId == 0)
-                {
-                    Despachos = await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes");
-                }
-                else
-                {
-                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes"))
-                        .Where(d => d.MenuId == DespachoAuxiliar.MenuId).ToList();
-                }
-                break;
+                case 2:
+                    if (DespachoAuxiliar.MenuId == 0)
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+                    }
+                    else
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.MenuId == DespachoAuxiliar.MenuId).ToList();
+                    }
+                    break;
 
-            case 3:
-                if (DespachoAuxiliar.CentroEducativoId == 0)
-                {
-                    Despachos = await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes");
-                }
-                else
-                {
-                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachoes"))
-                        .Where(d => d.CentroEducativoId == DespachoAuxiliar.CentroEducativoId).ToList();
-                }
-                break;
+                case 3:
+                    if (DespachoAuxiliar.CentroEducativoId == 0)
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+                    }
+                    else
+                    {
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.CentroEducativoId == DespachoAuxiliar.CentroEducativoId).ToList();
+                    }
+                    break;
+            }
+        }catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
+
 
         Conteo = Despachos != null ? Despachos.Count : 0;
     }

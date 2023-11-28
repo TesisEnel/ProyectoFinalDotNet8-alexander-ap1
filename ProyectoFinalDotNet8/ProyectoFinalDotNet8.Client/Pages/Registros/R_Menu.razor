@@ -26,7 +26,7 @@
                             <label>D&iacute;a semana:</label>
                             <InputSelect @bind-Value="Menu.DiaSemana" class="form-select">
                                 <option value="" selected>Seleccione un d&iacute;a</option>
-                                <option value="Lunes" >Lunes</option>
+                                <option value="Lunes">Lunes</option>
                                 <option value="Martes">Martes</option>
                                 <option value="Mi&eacute;rcoles">Mi&eacute;rcoles</option>
                                 <option value="Jueves">Jueves</option>
@@ -36,69 +36,69 @@
                         </div>
                     </div>
 
-                        <br />                  
-                        <fieldset>
-                            <div class="card-header">
-                                <h3>Comidas del men&uacute;</h3>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label> Comidas: </label>
-                                    <InputSelect @bind-Value="MenuDetalle.ComidaId" class="form-select">
+                    <br />
+                    <fieldset>
+                        <div class="card-header">
+                            <h3>Comidas del men&uacute;</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label> Comidas: </label>
+                                <InputSelect @bind-Value="MenuDetalle.ComidaId" class="form-select">
                                     <option value="0">Seleccione</option>
                                     @foreach (var item in Comidas)
-                                        {
-                                            <option value="@item.ComidaId">@item.Descripcion</option>
-                                        }
-                                    </InputSelect>
-                                    <ValidationMessage For="@(() => MenuDetalle.DetalleId)" />
-                                </div>
-                                <div class="row">
-                                    <div class="col">
+                                    {
+                                        <option value="@item.ComidaId">@item.Descripcion</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => MenuDetalle.DetalleId)" />
+                            </div>
+                            <div class="row">
+                                <div class="col">
 
-                                        <label class="form-label" for="Foto"><i class="oi oi-puzzle-piece" /> Foto:</label>
-                                        <InputFile OnChange="CargarImagen" class="form-control" accept=".png, .jpg, .jpeg" />
-                                        <ValidationMessage For="@(() => Menu.Imagen)" />
+                                    <label class="form-label" for="Foto"><i class="oi oi-puzzle-piece" /> Foto:</label>
+                                    <InputFile OnChange="CargarImagen" class="form-control" accept=".png, .jpg, .jpeg" />
+                                    <ValidationMessage For="@(() => Menu.Imagen)" />
 
-                                    </div>
                                 </div>
-                                <div class="col-md-5">
-                                    <label>Cantidad</label>
-                                     <div class="row"
+                            </div>
+                            <div class="col-md-5">
+                                <label>Cantidad</label>
+                                <div class="row"
                                         <div class="col">
                                             <div class="input-group">
                                             <button type="button" class="btn btn-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
                                         </div>
                                      </div>
-                                    </div> 
-                                </div>
+                                    </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Comida Id</th>
-                                                <th>Descripci&oacute;n</th>
-                                                <th>Menu Id</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Comida Id</th>
+                                            <th>Descripci&oacute;n</th>
+                                            <th>Menu Id</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                             @foreach (var item in this.Menu.MenuDetalles)
-                                            {
-                                                <tr>
-                                                    <td>@item.ComidaId</td>
-                                                    <td>@ObtenerDescripcion(item.ComidaId)</td>
-                                                    <td>@item.MenuId</td>
-                                                    <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="oi oi-trash" /></button></td>
-                                                </tr>
-                                            } 
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>                            
-                        </fieldset>                   
+                                        @foreach (var item in this.Menu.MenuDetalles)
+                                        {
+                                            <tr>
+                                                <td>@item.ComidaId</td>
+                                                <td>@ObtenerDescripcion(item.ComidaId)</td>
+                                                <td>@item.MenuId</td>
+                                                <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="bi bi-trash3-fill" /></button></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </fieldset>
                     <br />
                 </div>
                 <div class="card-footer">
@@ -166,7 +166,7 @@
                 foreach (var item in DetallesEliminados)
                 {
                     await httpClient.DeleteAsync($"api/Menus/DeleteDetalles/{item.DetalleId}");
-                    var disminuir = Comidas.FirstOrDefault(p => p.ComidaId == item.ComidaId);             
+                    var disminuir = Comidas.FirstOrDefault(p => p.ComidaId == item.ComidaId);
                 }
             }
 
@@ -255,7 +255,7 @@
             Nuevo();
     }
 
-    public async Task AgregarDetalle()
+    public void AgregarDetalle()
     {
         if (MenuDetalle.ComidaId > 0)
         {
@@ -290,11 +290,11 @@
         return new Menu();
     }
 
-    private async Task RemoveDatalle(MenuDetalles detalle)
+    private void RemoveDatalle(MenuDetalles detalle)
     {
         MenuDetalle = detalle;
         Menu.MenuDetalles.Remove(detalle);
-        DetallesEliminados.Add(detalle);    
+        DetallesEliminados.Add(detalle);
         StateHasChanged();
     }
 
@@ -310,6 +310,6 @@
     public string? ObtenerDescripcion(int Id)
     {
         var productos = Comidas.FirstOrDefault(t => t.ComidaId == Id);
-        return productos.Descripcion;
+        return productos!.Descripcion;
     }
 }

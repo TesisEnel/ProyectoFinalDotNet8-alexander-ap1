@@ -75,9 +75,9 @@
                                 }
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <span>Conteo: @Conteo</span>
-                                </tr>
+                                <th>
+                                    Conteo: @Conteo
+                                </th>
                             </tfoot>
                         </table>
                     </div>
@@ -104,7 +104,7 @@
         Tipos = await httpClient.GetFromJsonAsync<List<TiposComidas>>("api/TiposComidas")?? new List<TiposComidas>()?? new List<TiposComidas>();
         Desde = DateTime.Now.AddMonths(-1);
         Hasta = DateTime.Now;
-        Buscar();
+         await Buscar();
     }
 
     public async Task Buscar()
@@ -115,12 +115,12 @@
             case 0:
                 if (ComidaAuxiliar.ComidaId == 0)
                 {
-                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!;
                     StateHasChanged();
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(c => c.ComidaId == ComidaAuxiliar.ComidaId).ToList();
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(c => c.ComidaId == ComidaAuxiliar.ComidaId).ToList();
                     StateHasChanged();
                 }
                 break;
@@ -128,12 +128,12 @@
             case 1:
                 if (string.IsNullOrEmpty(ComidaAuxiliar.Descripcion))
                 {
-                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!;
                     StateHasChanged();
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(t => t.Descripcion
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(t => t.Descripcion
                         .Contains(ComidaAuxiliar.Descripcion, StringComparison.OrdinalIgnoreCase)).ToList();
                     StateHasChanged();
                 }
@@ -142,24 +142,24 @@
             case 2:
                 if (ComidaAuxiliar.TipoComidaId == 0)
                 {
-                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!;
                     StateHasChanged();
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
                     StateHasChanged();
                 }
                 break;
             case 3:
                 if (ComidaAuxiliar.TipoComidaId == 0)
                 {
-                    Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas");
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!;
                     StateHasChanged();
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas")).Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
                     StateHasChanged();
                 }
                 break;

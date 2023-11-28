@@ -28,7 +28,8 @@
                     <div class="row">
                         <div class="col">
                             <label>Fecha: </label>
-                            <InputDate @bind-Value="Despacho.Fecha" class="form-control"></InputDate>
+                            <InputDate @bind-Value="Despacho.Fecha" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                       max="@DateTime.Today.ToString("yyyy-MM-dd")"></InputDate>
                             <ValidationMessage For="@(() => Despacho.Fecha)" />
                         </div>
                     </div>
@@ -87,12 +88,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <div class="row"
-                                        <div class="col">
-                                            <div class="input-group">
-                                        </div>
-                                     </div>
-                                    </div>
+                                
                             </div>
                         </div>
                         <div class="row">
@@ -115,7 +111,7 @@
                                                 <td>@ObtenerDescripcionComida(item.ComidaId)</td>
                                                 <td>@item.ComidaId</td>
                                                 <td>@item.CantidadDecomida</td>
-                                                <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="oi oi-trash" /></button></td>
+                                                <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="bi bi-trash3-fill" /></button></td>
                                             </tr>
                                         }
                                     </tbody>
@@ -135,6 +131,7 @@
             </div>
         </div>
     </div>
+    <ValidationSummary/>
 </EditForm>
 
 @code {
@@ -155,7 +152,7 @@
         var comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas");
         var centrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
         var menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus");
-        if (centrosEducativos.Count > 0 )
+        if (centrosEducativos!.Count > 0 )
         {
             CentrosEducativos = centrosEducativos;
             Despacho.CentroEducativoId = centrosEducativos.First().CentroEducativoId;
@@ -183,7 +180,7 @@
 
     public async Task Guardar()
     {
-        using var response = await httpClient.PostAsJsonAsync("api/Despachoes", Despacho);
+        using var response = await httpClient.PostAsJsonAsync("api/Despachos", Despacho);
         if (!response.IsSuccessStatusCode)
         {
             var mensaje = new NotificationMessage
@@ -227,7 +224,6 @@
             notificationService.Notify(mensaje);
             Nuevo();
             StateHasChanged();
-
         }
     }
 
@@ -252,11 +248,11 @@
     {
         // DespachoDetalle = new();
         DetallesAgregado = new();
-        var despachoNotNull = (await httpClient.GetFromJsonAsync<List<Despacho>>($"api/Despachoes"))
+        var despachoNotNull = (await httpClient.GetFromJsonAsync<List<Despacho>>($"api/Despachos"))!
         .ToList().Any(e => e.DespachoId == Despacho.DespachoId);
         if (despachoNotNull)
         {
-            var despachoEncontrado = await httpClient.GetFromJsonAsync<Despacho>($"api/Despachoes/{Despacho.DespachoId}");
+            var despachoEncontrado = await httpClient.GetFromJsonAsync<Despacho>($"api/Despachos/{Despacho.DespachoId}");
             if (despachoEncontrado != null)
             {
                 Despacho = despachoEncontrado;
@@ -278,7 +274,7 @@
 
     public async Task Eliminar()
     {
-        using var response = await httpClient.DeleteAsync($"api/Despachoes/{Despacho.DespachoId}");
+        using var response = await httpClient.DeleteAsync($"api/Despachos/{Despacho.DespachoId}");
         if (!response.IsSuccessStatusCode)
         {
             var mensaje = new NotificationMessage
@@ -295,12 +291,12 @@
             Nuevo();
     }
 
-    public async Task AgregarDetalle()
+    public void AgregarDetalle()
     {
         // if (DespachoDetalle.CantidadDecomida > 0)
-        var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId).CantidadMatricula <= DespachoDetalle.CantidadDecomida;
+        var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula <= DespachoDetalle.CantidadDecomida;
         var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
-        var VerificarComida = menuEncotrado.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
+        var VerificarComida = menuEncotrado!.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
         if (VerificarCantidadComida && VerificarComida)
         {
             DespachoDetalle.DespachoId = Despacho.DespachoId;
@@ -317,7 +313,7 @@
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
-                        Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId).CantidadMatricula} raciones)",
+                        Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula} raciones)",
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
@@ -341,7 +337,7 @@
     private async Task<Despacho> BuscarDespacho(int entradasId)
     {
         Despacho despacho = new();
-        var despachoEncontrado = await httpClient.GetFromJsonAsync<Despacho>($"api/Despachoes/{entradasId}");
+        var despachoEncontrado = await httpClient.GetFromJsonAsync<Despacho>($"api/Despachos/{entradasId}");
 
         if (despachoEncontrado != null)
             return despacho = despachoEncontrado;
@@ -349,7 +345,7 @@
         return new Despacho();
     }
 
-    private async Task RemoveDatalle(DespachoDetalle detalle)
+    private void RemoveDatalle(DespachoDetalle detalle)
     {
         var detalleEncontrado = Despacho.DespachoDetalles.FirstOrDefault(ed => ed.DetalleId == detalle.DetalleId);
         if (detalleEncontrado != null)

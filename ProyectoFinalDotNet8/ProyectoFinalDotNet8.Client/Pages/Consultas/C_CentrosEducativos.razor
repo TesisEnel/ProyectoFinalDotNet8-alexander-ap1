@@ -94,9 +94,9 @@
                                 }
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <span>Conteo: @Conteo</span>
-                                </tr>
+                                <th>
+                                    Conteo: @Conteo
+                                </th>
                             </tfoot>
                         </table>
                     </div>
@@ -128,11 +128,11 @@
             case 0:
                 if (CentroEducativoAuxiliar.CentroEducativoId == 0)
                 {
-                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
                         .Where(c => c.CentroEducativoId == CentroEducativoAuxiliar.CentroEducativoId).ToList();
                 }
                 break;
@@ -140,23 +140,23 @@
             case 1:
                 if (string.IsNullOrEmpty(CentroEducativoAuxiliar.Nombre))
                 {
-                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
-                        .Where(c => c.Nombre.Contains(CentroEducativoAuxiliar.Nombre, StringComparison.OrdinalIgnoreCase)).ToList();
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
+                        .Where(c => c.Nombre!.Contains(CentroEducativoAuxiliar.Nombre, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
                 break;
 
             case 2: 
                 if (CentroEducativoAuxiliar.CantidadMatricula <= 0)
                 {
-                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
                         .Where(c => c.CantidadMatricula == CentroEducativoAuxiliar.CantidadMatricula).ToList();
                 }
                 break;
@@ -164,7 +164,7 @@
             case 3: 
                 if (string.IsNullOrEmpty(CentroEducativoAuxiliar.CodigoDistrital))
                 {
-                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
@@ -176,11 +176,11 @@
             case 4: 
                 if (string.IsNullOrEmpty(CentroEducativoAuxiliar.CodigoRegional))
                 {
-                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
                         .Where(c => c.CodigoRegional ==CentroEducativoAuxiliar.CodigoRegional).ToList();
                 }
                 break;
@@ -188,12 +188,12 @@
             case 5:
                 if (string.IsNullOrEmpty(CentroEducativoAuxiliar.Direccion))
                 {
-                    CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos");
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))
-                        .Where(c => c.Direccion.Contains(CentroEducativoAuxiliar.Direccion, StringComparison.OrdinalIgnoreCase)).ToList();
+                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
+                        .Where(c => c.Direccion!.Contains(CentroEducativoAuxiliar.Direccion, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
                 break;
         }

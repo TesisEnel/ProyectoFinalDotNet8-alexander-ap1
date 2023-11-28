@@ -84,8 +84,10 @@
 
                                         <br />
                                         @* <button class="btn btn-primary" href="RegistroComida/@tabla.ComidaId">Editar</button> *@
-                                        <a href="/RegistroMenu/@menu.MenuId"><button type="button" class="btn btn-primary"><i class="oi oi-plus"> Editar</i></button></a>
-                                        <a href="/Comentarios/@menu.MenuId"><button type="button" class="btn btn-warning"><i class="oi oi-plus"> Comentar</i></button></a>
+                                            <button type="button" @onclick="(() => IrRegistroMenu(menu.MenuId))"  class="btn btn-primary">Editar</button>
+                                            <button type="button" @onclick="(() => IrComentarios(menu.MenuId))" class="btn btn-success">Comentar</button>
+                                        @* <a href="/RegistroMenu/@menu.MenuId"><button type="button" class="btn btn-primary"><i class="oi oi-plus"> Editar</i></button></a>
+                                        <a href="/Comentarios/@menu.MenuId"><button type="button" class="btn btn-warning"><i class="oi oi-plus"> Comentar</i></button></a> *@
 
                                         
 
@@ -169,5 +171,13 @@
     {
         var comida = Comidas.FirstOrDefault(c => c.ComidaId == comidaId);
         return comida?.Descripcion!;
+    }
+    public void IrComentarios(int menuId)
+    {
+        NavigationManager.NavigateTo($"/Comentarios/{menuId}");
+    }
+    public void IrRegistroMenu(int menuId)
+    {
+        NavigationManager.NavigateTo($"/RegistroMenu/{menuId}");
     }
 }

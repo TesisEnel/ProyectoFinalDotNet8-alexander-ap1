@@ -48,95 +48,125 @@
                 </div>
             </div>
 
-
-    @* </header> *@
-
-    @* <div class="row rounded-lg overflow-hidden shadow"> *@
-        <!-- Usuarios -->
-        @* <div class="col-5 px-0">
-            <div class="bg-white">
-                <div class="bg-gray px-4 py-2 bg-light">
-                    <p class="h5 mb-0 py-1">Comidas</p>
-                </div>
-
-                <div class="messages-box">
-                    <div class="list-group rounded-0">
-                        <!-- Aquí puedes iterar sobre tus comentarios y mostrar los usuarios -->
-                        
-                        @foreach (var menu in menus)
-                        {
-                                <a class="list-group-item list-group-item-action list-group-item-light rounded-0" @onclick="(() => ElegirMenu(menu.MenuId, AuthState?.User?.Identity?.Name!))">
-                                <div class="media">
-                                   
-                                        @if (menu.Imagen != null)
-                                        {
-                                            var base64 = Convert.ToBase64String(menu.Imagen);
-                                            var imgSrc = $"data:image/jpeg;base64,{base64}";
-                                            <img src="@imgSrc" alt="Imagen del producto" width="100px" height="100px" class="rounded-circle"/>
-                                        }
-                                    <div class="media-body ml-4">
-                                        <div class="d-flex align-items-center justify-content-between mb-1">
-                                            <h6 class="mb-0">@menu.Descripcion</h6><small class="small font-weight-bold">@menu.DiaSemana</small>
-                                        </div>
-                                     
-                                    </div>
-                                </div>
-                            </a>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div> *@
-
-
         <!-- Área de chat -->
         <div class="col px-0">
             <div class="px-5 py-5 chat-box bg-white">
                 <!-- Puedes continuar iterando sobre tus comentarios y mostrarlos en el área de chat -->
                 @foreach (var comentario in ComentariosEnviados)
                 {
+
                     @if (AuthState?.User?.Identity?.Name == comentario.Usuario)
                     {
-                        <div class="row justify-content-end">
-                            <div class="container text-end">
-                            <div > 
-                                <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
-                            </div> 
 
+                        <div class="row justify-content-end">
+
+                            <div class="container text-end d-flex flex-column align-items-end">
+
+                                <div>
+                                    <!-- Imagen -->
+                                    <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
+
+                                </div>
                                 @if (AuthState is not null)
                                 {
                                     <strong>@AuthState?.User?.Identity?.Name</strong>
                                 }
+                                <!-- Nombre de usuario -->
 
-                                <div class="media-body ">
-                                    <div class="bg-light rounded 2">
-                                        <p class="text-small mb-0 text-muted">@comentario.ComentarioTexto</p>
+                                <div class="media-body col-auto">
+                                    <!-- Contenedor comenatrio -->
+                                    <div class="bg-info rounded-2 w-100">
+
+                                        <p class="text-muted m-0 text-break">
+                                            @comentario.ComentarioTexto
+                                        </p>
+
                                     </div>
-                                    <p class="small text-muted">@comentario.Fecha.ToString("hh:mm tt | dd MMM")</p>
+
+                                    <p class="small text-muted text-right">
+                                        @comentario.Fecha.ToString("hh:mm tt | dd MMM")
+                                    </p>
                                 </div>
+
                             </div>
 
                         </div>
                     }
                     else
                     {
+
                         <div class="row justify-content-start">
+
+                            <div class="container text-start d-flex flex-column align-items-start">
+
+                                <div>
+                                    <!-- Imagen -->
+                                    <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
+
+                                </div>
+                                @if (AuthState is not null)
+                                {
+                                    <strong>@AuthState?.User?.Identity?.Name</strong>
+                                }
+                                <!-- Nombre de usuario -->
+
+                                <div class="media-body col-auto">
+                                    <!-- Contenedor comenatrio -->
+                                    <div class="bg-light rounded-2 w-100">
+
+                                        <p class="text-muted m-0 text-break">
+                                            @comentario.ComentarioTexto
+                                        </p>
+
+                                    </div>
+
+                                    <p class="small text-muted text-right">
+                                        @comentario.Fecha.ToString("hh:mm tt | dd MMM")
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                       @*  <div class="row justify-content-start">
                             <div class="media w-50 mb-3">
                                 <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" class="rounded-circle">
                             </div>
 
                             @if (AuthState is not null)
                             {
-                                <strong>@comentario</strong>
+                                <strong>@comentario.Usuario</strong>
                             }
 
-                            <div class="media-body ">
-                                <div class="bg-light rounded 2">
+
+                            <div class="media-body col-auto">
+
+                                <div class="bg-light rounded-2">
+
+                                    <p class="text-small mb-0 text-muted overflow-hidden h-100">
+                                        @comentario.ComentarioTexto
+                                    </p>
+
+                                </div>
+
+                                <p class="small text-muted">
+                                    @comentario.Fecha.ToString("hh:mm tt | dd MMM")
+                                </p>
+
+                            </div> *@
+
+
+
+                           @*  <div class="media-body col-auto ">
+                                <div class="bg-light rounded 2 ">
                                     <p class="text-small mb-0 text-muted">@comentario.ComentarioTexto</p>
                                 </div>
                                 <p class="small text-muted">@comentario.Fecha.ToString("hh:mm tt | dd MMM")</p>
-                            </div>
-                        </div>
+                            </div> 
+                        </div>*@
                     }                    
                 }
             </div>
@@ -156,10 +186,6 @@
 </EditForm>
 
 
-
-
-
-
 @code {
     [Parameter]
     public int menuId { get; set; }
@@ -169,6 +195,7 @@
     public List<Menu> menus { get; set; } = new();
     public Menu Menu { get; set; } = new();
     public int menuActual { get; set; }
+    public string? emailActual { get; set; }
     public AuthenticationState? AuthState { get; set; }     // public List<AplicationUser> MyProperty { get; set; }
     protected override async Task OnInitializedAsync()
     {
@@ -190,6 +217,7 @@
         var user = Usuarios.FirstOrDefault(u => u.Email == email);
         var comentarios = (await httpClient.GetFromJsonAsync<List<Comentarios>>("api/Menus/Comentarios"))!.Where(c => c.MenuId == menuId).ToList();
         var menu = (await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus"))!.FirstOrDefault(m => m.MenuId == menuId);
+        emailActual = email;
         Menu = menu!;
         ComentariosEnviados = comentarios;
         comentario.MenuId = menuId;
@@ -201,9 +229,24 @@
     }
     public async Task Guardar()
     {
+        var user = Usuarios.FirstOrDefault(u => u.Email == emailActual);        
+        var comentarios = (await httpClient.GetFromJsonAsync<List<Comentarios>>("api/Menus/Comentarios"))!.Where(c => c.MenuId == menuId).ToList();
+        var menu = (await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus"))!.FirstOrDefault(m => m.MenuId == menuId);
+        Menu = menu!;
+        ComentariosEnviados = comentarios;
+        comentario.MenuId = menuId;
+        comentario.Nota = 2;
+        comentario.Fecha = DateTime.Now;
+        comentario.Usuario = user!.UserName;
+        comentario.UsuarioId = user.Id;
+        menuActual = menuId;
+
+
         var agregarComentario = menus.FirstOrDefault(m => m.MenuId == menuActual);
         agregarComentario!.ComenentarioDetalle.Add(comentario);
         using var response = await httpClient.PostAsJsonAsync("api/Menus", agregarComentario);
+        // using var response = await httpClient.PutAsJsonAsync("api/Menus", menuActual, agregarComentario);
+        // using var response = await httpClient.PutAsJsonAsync($"api/Menus/{menuActual}", agregarComentario);
         if (!response.IsSuccessStatusCode)
         {
             var mensaje = new NotificationMessage
