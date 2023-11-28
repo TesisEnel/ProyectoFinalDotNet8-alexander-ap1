@@ -12,7 +12,7 @@ namespace Shared.Models
         [Key]
         public int ComidaId { get; set; }
         [Required(ErrorMessage = "Debes de introducir una descripción a la comida")]
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Debes de eligir un tipo de comida")]
         public int TipoComidaId { get; set; }
     }
