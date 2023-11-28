@@ -32,7 +32,13 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Despacho>> GetDespacho(int id)
         {
-            var despacho = await _context.Despachos.FindAsync(id);
+            if (_context.Despachos == null)
+            {
+                return NotFound();
+            }
+            var despacho = await _context.Despachos.Include(Dd => Dd.DespachoDetalles)
+                .Where(d => d.DespachoId == id)
+                .FirstOrDefaultAsync();
 
             if (despacho == null)
             {
@@ -47,6 +53,7 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDespacho(int id, Despacho despacho)
         {
+
             if (id != despacho.DespachoId)
             {
                 return BadRequest();

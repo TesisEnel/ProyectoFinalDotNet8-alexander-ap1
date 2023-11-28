@@ -89,8 +89,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListDistritos = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos");
-        ListRegiones = await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones");
+        ListDistritos = (await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos"))!;
+        ListRegiones = (await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones"))!;
         if (CentroEducativoId > 0)
         {
             centroEducativo.CentroEducativoId = CentroEducativoId;
@@ -113,10 +113,10 @@
         notificationService.Notify(mensaje);
     }
 
-    private void StateHasChanged()
-    {
-        InvokeAsync(() => base.StateHasChanged());
-    }
+    // private void StateHasChanged()
+    // {
+    //     InvokeAsync(() => base.StateHasChanged());
+    // }
     public async Task Buscar()
     {
         var centroEducativoEncontrado = await httpClient.GetFromJsonAsync<CentrosEducativos>($"api/CentrosEducativos/{centroEducativo.CentroEducativoId}");

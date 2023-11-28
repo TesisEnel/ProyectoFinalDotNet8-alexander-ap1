@@ -13,7 +13,7 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
         <div class="nav-item px-0">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="/Home" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
@@ -30,49 +30,80 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-0">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
-            </NavLink>
-        </div>
-
-        
-
-
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-0">
                     <NavLink class="nav-link" href="ConsultaComida">
-                        <span class="bi bi-clipboard-plus-fill" aria-hidden="true"></span> Consulta comida
+                        <span aria-hidden="true"><i class="bi bi-egg-fried"></i></span> Consulta comida
                     </NavLink>
                 </div>
                 <div class="nav-item px-0">
                     <NavLink class="nav-link" href="ConsultaMenu">
-                        <span class="bi bi-basket2-fill" aria-hidden="true"></span> Consulta Menu
+                        <span aria-hidden="true"><i class ="bi bi-journal"></i></span> Consulta Menu
                     </NavLink>
                 </div>
                 <div class="nav-item ">
                     <NavLink class="nav-link" href="ConsultaCentroEducativo">
-                        <span class="bi bi-building-fill" aria-hidden="true"></span>Consulta Centro Educativo
+                        <span aria-hidden="true"><i class="bi bi-building-fill"></i></span>Consulta Centro Educativo
                     </NavLink>
                 </div>
                 <div class="nav-item px-0">
                     <NavLink class="nav-link" href="ConsultaDespacho">
-                        <span class="bi bi-book-fill" aria-hidden="true"></span>  Consulta Comida
+                        <span aria-hidden="true"> <i class="bi bi-box-seam-fill"></i></span>  Consulta Despacho
                     </NavLink>
                 </div>
             </Authorized>
         </AuthorizeView>
 
+        <AuthorizeView Roles="Admin, Empleado">
+            <Authorized >
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="RegistroComida">
+                        <span aria-hidden="true"><i class="bi bi-egg-fried"></i></span> Registro Comida
+                    </NavLink>
+                </div>
+        
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="RegistroMenu">
+                        <span aria-hidden="true"> <i class ="bi bi-journal"/></span> Registro Menu
+                    </NavLink>
+                </div>      
+
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="RegistroCentroEducativo">
+                        <span aria-hidden="true"> <i class="bi bi-building-fill"/></span> Registro Centro Educativo
+                    </NavLink>
+                </div>
+        
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="RegistroDespacho">
+                        <span aria-hidden="true"><i class="bi bi-box-seam-fill"/></span> Registro Despacho
+                    </NavLink>
+                </div>
+            </Authorized>
+
+            <NotAuthorized>
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="Account/Register">
+                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                    </NavLink>
+                </div>
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="">
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
 
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-1">
+                <div class="nav-item px-0">
                     <NavLink class="nav-link" href="Account/Manage">
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
                     </NavLink>
                 </div>
-                <div class="nav-item px-1">
+                <div class="nav-item px-0">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@currentUrl" />
@@ -81,50 +112,7 @@
                         </button>
                     </form>
                 </div>
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="RegistroComida">
-                        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Registro Comida
-                    </NavLink>
-                </div>
-
-
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="Comentarios">
-                        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Comentarios
-                    </NavLink>
-                </div>
-
-
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="RegistroMenu">
-                        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Registro Comida
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="RegistroCentroEducativo">
-                        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Registro Comida
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="RegistroDespacho">
-                        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Registro Comida
-                    </NavLink>
-                </div>
             </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-1">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
         </AuthorizeView>
     </nav>
 </div>
