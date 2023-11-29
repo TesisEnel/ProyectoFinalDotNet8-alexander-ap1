@@ -55,6 +55,16 @@
             </Authorized>
         </AuthorizeView>
 
+        <AuthorizeView Roles="Director">
+            <Authorized >
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="ConsultaDespachoParaDirector">
+                        <span aria-hidden="true"><i class="bi bi-egg-fried"></i></span> Despachos
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
         <AuthorizeView Roles="Admin, Empleado">
             <Authorized >
                 <div class="nav-item px-0">

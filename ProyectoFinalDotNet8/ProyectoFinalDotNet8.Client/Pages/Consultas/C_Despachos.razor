@@ -1,4 +1,5 @@
 ﻿@rendermode InteractiveAuto
+@inject NavigationManager NavigationManager
 @page "/ConsultaDespacho"
 @inject HttpClient httpClient
 @attribute [Authorize]
@@ -56,38 +57,49 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table border="1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr class="table-secondary">
-                                    <th>ID</th>
-                                    <th>Fecha</th>
-                                    <th>Men&uacute</th>
-                                    <th>Centro Educativo</th>
-                                    <th>Ver</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var despacho in Despachos)
-                                {
-                                    <tr>
-                                        <td>@despacho.DespachoId</td>
-                                        <td>@despacho.Fecha.ToString("yyyy-MM-dd")</td>
-                                        <td>@ObtenerDescripcionMenu(despacho.MenuId)</td>
-                                        <td>@ObtenerNombreCentroEducativo(despacho.CentroEducativoId)</td>
-                                        <td><a href="RegistroDespacho/@despacho.DespachoId">ver</a></td>
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>
-                                        Conteo: @Conteo
-                                    </th>
-                                </tr>                                
-                            </tfoot>
-                        </table>
+                        <div class="col">
+                            <h3>Listados de men&uacute;</h3>
+
+                        </div>
+
+                        @foreach (var despacho in Despachos)
+                        {
+                            <div class="card">
+                                <div class="container mt-5">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            @if (ObtenerImagen(despacho.MenuId) != null)
+                                            {
+                                                var base64 = Convert.ToBase64String(ObtenerImagen(despacho.MenuId));
+                                                var imgSrc = $"data:image/jpeg;base64,{base64}";
+                                                <img src="@imgSrc" alt="Imagen del producto" class="rounded mx-auto d-block img-fluid" style="max-width: 300px; max-height: 300px; margin: 5px;" />
+                                            }
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h2>@ObtenerNombreCentroEducativo(despacho.CentroEducativoId)</h2>
+                                            <p><strong>Men&uacute;:</strong> @ObtenerNombreMenu(despacho.MenuId)</p>
+                                            <strong>Descripc&iacute;on:</strong>
+                                            @foreach (var comida in ObtenerMenuDetalles(despacho.MenuId))
+                                            {
+                                                <p class="text-muted">@ObtenerDescripcionComida(comida.ComidaId)</p>
+                                            }
+                                            <p><strong>Fecha de despacho:</strong> @despacho.Fecha.ToString("dd/MMM/yyyy")</p>
+                                            <p><strong>Hora de despacho:</strong> @despacho.Fecha.ToString("hh:mmtt")</p>
+
+                                            <button type="button" @onclick="(() => EditarDespacho(despacho.DespachoId))" class="btn btn-primary">Editar</button>
+                                            <button type="button" @onclick="(() => EliminarDespacho(despacho.DespachoId))" class="btn btn-danger">Eliminar</button>
+
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -100,10 +112,11 @@
     public Despacho DespachoAuxiliar = new Despacho();
     public List<CentrosEducativos> CentrosEducativos { get; set; } = new List<CentrosEducativos>();
     public List<Menu> Menus { get; set; } = new List<Menu>();
-
+    public List<Comidas> Comidas { get; set; } = new List<Comidas>();
     protected override async Task OnInitializedAsync()
     {
-        Menus = (await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus"))!;
+        Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas") ?? new List<Comidas>();
+        Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
         CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos")?? new List<CentrosEducativos>();
 
     }
@@ -176,10 +189,41 @@
         var menu = Menus.FirstOrDefault(m => m.MenuId == Id);
         return menu?.Descripcion;
     }
-
+    public string? ObtenerDescripcionComida(int comidaId)
+    {
+        var comida = Comidas.FirstOrDefault(c => c.ComidaId == comidaId);
+        return comida?.Descripcion!;
+    }
     public string? ObtenerNombreCentroEducativo(int Id)
     {
         var centroEducativo = CentrosEducativos.FirstOrDefault(t => t.CentroEducativoId == Id);
         return centroEducativo?.Nombre;
+    }
+    public List<MenuDetalles> ObtenerMenuDetalles(int Id)
+    {
+        var menu = Menus.FirstOrDefault(m => m.MenuId == Id);
+        return menu?.MenuDetalles.ToList()!;
+    }
+    public byte[] ObtenerImagen(int Id)
+    {
+        var menu = Menus.FirstOrDefault(m => m.MenuId == Id);
+        return menu?.Imagen!;
+    }
+
+    public void EditarDespacho(int Id)
+    {
+        NavigationManager.NavigateTo($"/RegistroDespacho/{Id}");
+    }
+
+    public string? ObtenerNombreMenu(int Id)
+    {
+        var menu = Menus.FirstOrDefault(m => m.MenuId == Id);
+        return menu?.Descripcion;
+    }
+
+    public async Task EliminarDespacho(int Id)
+    {
+        var eliminar = await httpClient.DeleteAsync($"api/Despachos/{Id}");
+        await Buscar();
     }
 }
