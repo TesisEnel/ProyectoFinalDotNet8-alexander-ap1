@@ -78,7 +78,7 @@ namespace ProyectoFinalDotNet8.Components.Account
         {
             if (authenticationStateTask is null)
             {
-                throw new UnreachableException($"Authentication state not set in {nameof(OnPersistingAsync)}().");
+                throw new UnreachableException($"El estado de autenticación no está establecido en {nameof(OnPersistingAsync)}().");
             }
 
             var authenticationState = await authenticationStateTask;
