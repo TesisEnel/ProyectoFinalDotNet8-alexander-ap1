@@ -24,7 +24,7 @@
 
                         @foreach (var despacho in Despachos)
                         {
-                            @if (UsuarioCentroEducativo())
+                            @if (UsuarioCentroEducativo(despacho.CentroEducativoId) && Negacion(despacho.ConfirmacionEntrega))
                             {
                                 <div class="card">
                                     <div class="container mt-5">
@@ -48,8 +48,8 @@
                                                 <p><strong>Fecha de despacho:</strong> @despacho.Fecha.ToString("dd/MMM/yyyy")</p>
                                                 <p><strong>Hora de despacho:</strong> @despacho.Fecha.ToString("hh:mmtt")</p>
 
-                                                <button type="button" @onclick="(() => EditarDespacho(despacho.DespachoId))" class="btn btn-primary">Editar</button>
-                                                <button type="button" @onclick="(() => EliminarDespacho(despacho.DespachoId))" class="btn btn-danger">Eliminar</button>
+                                                <button type="button" @onclick="(() => ConfirmarDespacho(despacho.DespachoId))" class="btn btn-primary">Confirmar</button>
+
 
                                             </div>
                                         </div>
@@ -65,13 +65,13 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <div class="col">
-                            <h3>Despachos :</h3>
+                            <h3>Despachados :</h3>
 
                         </div>
 
                         @foreach (var despacho in Despachos)
                         {
-                            @if (UsuarioCentroEducativo())
+                            @if (UsuarioCentroEducativo(despacho.CentroEducativoId) && despacho.ConfirmacionEntrega)
                             {
                                 <div class="card">
                                     <div class="container mt-5">
@@ -95,8 +95,8 @@
                                                 <p><strong>Fecha de despacho:</strong> @despacho.Fecha.ToString("dd/MMM/yyyy")</p>
                                                 <p><strong>Hora de despacho:</strong> @despacho.Fecha.ToString("hh:mmtt")</p>
 
-                                                <button type="button" @onclick="(() => EditarDespacho(despacho.DespachoId))" class="btn btn-primary">Editar</button>
-                                                <button type="button" @onclick="(() => EliminarDespacho(despacho.DespachoId))" class="btn btn-danger">Eliminar</button>
+                                                <button type="button" @onclick="(() => ConfirmarDespacho(despacho.DespachoId))" class="btn btn-danger">Desconfirmar</button>
+                                                @* <button type="button" @onclick="(() => EliminarDespacho(despacho.DespachoId))" class="btn btn-danger">Eliminar</button> *@
 
                                             </div>
                                         </div>
@@ -252,24 +252,44 @@
         return usuario?.Id!;
 
     }
-    public bool UsuarioCentroEducativo()
+
+    public bool UsuarioCentroEducativo( int Id)
     {
         var usuario = Usuarios.FirstOrDefault(u => u.Email == AuthState?.User?.Identity?.Name);
-        var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id);
+        var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id && c.CentroEducativoId == Id);
         return centro != null;
     }
+    
 
-   
+
+    // public bool UsuarioCentroEducativo()
+    // {
+    //     var usuario = Usuarios.FirstOrDefault(u => u.Email == AuthState?.User?.Identity?.Name);
+    //     var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id);
+    //     return centro != null;
+    // }
+
+
 
 
     public async Task ConfirmarDespacho(int Id)
     {
         var despacho = Despachos.FirstOrDefault(d => d.DespachoId == Id);
-        despacho!.ConfirmacionEntrega = true;
+
+        if(despacho!.ConfirmacionEntrega == false)
+            despacho!.ConfirmacionEntrega = true;
+
+        else
+            despacho!.ConfirmacionEntrega = false;
+
         despacho.FechaRecepcion = DateTime.Now;
         var response = await httpClient.PutAsJsonAsync($"api/Despachos/{Id}", despacho);
+        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+        StateHasChanged();
         await Buscar();
     }
+    public bool Negacion(bool valor) => !valor;
+  
     // {
     //     var usuario = await httpClient.GetFromJsonAsync<ApplicationUser>($"api/Usuarios/{AuthState?.User?.Identity?.Name}");
     //     DespachoAuxiliar. = usuario?.Id;
