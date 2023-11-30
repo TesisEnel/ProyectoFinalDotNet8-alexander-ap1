@@ -1,5 +1,4 @@
 ﻿//using Microsoft.AspNetCore.Http;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
