@@ -82,10 +82,14 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpPost]
         public async Task<ActionResult<CentrosEducativos>> PostCentrosEducativos(CentrosEducativos centrosEducativos)
         {
-            _context.CentrosEducativos.Add(centrosEducativos);
+            if (!CentrosEducativosExists(centrosEducativos.CentroEducativoId))
+                _context.CentrosEducativos.Add(centrosEducativos);
+            else
+                _context.CentrosEducativos.Update(centrosEducativos);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCentrosEducativos", new { id = centrosEducativos.CentroEducativoId }, centrosEducativos);
+            return Ok(centrosEducativos);
         }
 
         // DELETE: api/CentrosEducativos/5
