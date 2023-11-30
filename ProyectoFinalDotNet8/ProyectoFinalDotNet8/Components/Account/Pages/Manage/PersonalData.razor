@@ -2,16 +2,16 @@
 
 @inject IdentityUserAccessor UserAccessor
 
-<PageTitle>Personal Data</PageTitle>
+<PageTitle>Datos personales</PageTitle>
 
 <StatusMessage />
-<h3>Personal Data</h3>
+<h3>Datos personales</h3>
 
 <div class="row">
     <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+        <p>Su cuenta contiene los datos personales que nos ha proporcionado. Esta página le permite descargar o eliminar esos datos.</p>
         <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+            <strong>Al eliminar estos datos, se eliminará permanentemente su cuenta y no se podrá recuperar.</strong>
         </p>
         <form action="Account/Manage/DownloadPersonalData" method="post">
             <AntiforgeryToken />

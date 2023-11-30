@@ -77,10 +77,13 @@
                                     }       
                                         <p><strong>D&iacute;a de la semana:</strong> @menu.DiaSemana</p>                                       
                                         <strong> Nota promedio: </strong>
-                                        @for (int i = 0; i < menu.ComenentarioDetalle.Average(c => c.Nota); i++)
-                                        {
-                                            <i class="bi bi-star-fill"></i>
-                                        }
+                                            @if(menu.ComenentarioDetalle.Count > 0)
+                                            {
+                                                @for (int i = 0; i < menu.ComenentarioDetalle.Average(c => c.Nota); i++)
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                            }                                          
 
                                         <br />
                                         @* <button class="btn btn-primary" href="RegistroComida/@tabla.ComidaId">Editar</button> *@
