@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoFinalDotNet8.Data;
 
@@ -10,9 +11,11 @@ using ProyectoFinalDotNet8.Data;
 namespace ProyectoFinalDotNet8.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231128213203_Poniendo restriccion para codigoDistrital y codigoRegional")]
+    partial class PoniendorestriccionparacodigoDistritalycodigoRegional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -403,174 +406,6 @@ namespace ProyectoFinalDotNet8.Migrations
                             CodigoDistrito = "04",
                             CodigoRegional = "07",
                             NombreDistrital = "Tenares"
-                        },
-                        new
-                        {
-                            DistritoId = 5,
-                            CodigoDistrito = "03",
-                            CodigoRegional = "08",
-                            NombreDistrital = "Santiago Sur-Este"
-                        },
-                        new
-                        {
-                            DistritoId = 6,
-                            CodigoDistrito = "04",
-                            CodigoRegional = "08",
-                            NombreDistrital = "Santiago Noroeste"
-                        },
-                        new
-                        {
-                            DistritoId = 7,
-                            CodigoDistrito = "05",
-                            CodigoRegional = "08",
-                            NombreDistrital = "Santiago Centro-Oeste"
-                        },
-                        new
-                        {
-                            DistritoId = 8,
-                            CodigoDistrito = "05",
-                            CodigoRegional = "10",
-                            NombreDistrital = "Boca Chica"
-                        },
-                        new
-                        {
-                            DistritoId = 9,
-                            CodigoDistrito = "06",
-                            CodigoRegional = "10",
-                            NombreDistrital = "Mendoza"
-                        },
-                        new
-                        {
-                            DistritoId = 10,
-                            CodigoDistrito = "07",
-                            CodigoRegional = "10",
-                            NombreDistrital = "San Antonio De Guerra"
-                        },
-                        new
-                        {
-                            DistritoId = 11,
-                            CodigoDistrito = "01",
-                            CodigoRegional = "11",
-                            NombreDistrital = "Sosua"
-                        },
-                        new
-                        {
-                            DistritoId = 12,
-                            CodigoDistrito = "02",
-                            CodigoRegional = "11",
-                            NombreDistrital = "Puerto Plata"
-                        },
-                        new
-                        {
-                            DistritoId = 13,
-                            CodigoDistrito = "01",
-                            CodigoRegional = "12",
-                            NombreDistrital = "Higuey"
-                        },
-                        new
-                        {
-                            DistritoId = 14,
-                            CodigoDistrito = "01",
-                            CodigoRegional = "14",
-                            NombreDistrital = "Nagua"
-                        },
-                        new
-                        {
-                            DistritoId = 15,
-                            CodigoDistrito = "01",
-                            CodigoRegional = "16",
-                            NombreDistrital = "Cotui"
-                        },
-                        new
-                        {
-                            DistritoId = 16,
-                            CodigoDistrito = "04",
-                            CodigoRegional = "16",
-                            NombreDistrital = "Bonao Suroeste"
-                        },
-                        new
-                        {
-                            DistritoId = 17,
-                            CodigoDistrito = "03",
-                            CodigoRegional = "01",
-                            NombreDistrital = "Barahona"
-                        },
-                        new
-                        {
-                            DistritoId = 18,
-                            CodigoDistrito = "05",
-                            CodigoRegional = "02",
-                            NombreDistrital = "San Juan Este"
-                        },
-                        new
-                        {
-                            DistritoId = 19,
-                            CodigoDistrito = "01",
-                            CodigoRegional = "03",
-                            NombreDistrital = "Azua"
-                        },
-                        new
-                        {
-                            DistritoId = 20,
-                            CodigoDistrito = "03",
-                            CodigoRegional = "03",
-                            NombreDistrital = "San Jose De Ocoa"
-                        },
-                        new
-                        {
-                            DistritoId = 21,
-                            CodigoDistrito = "05",
-                            CodigoRegional = "03",
-                            NombreDistrital = "Nizao"
-                        },
-                        new
-                        {
-                            DistritoId = 22,
-                            CodigoDistrito = "04",
-                            CodigoRegional = "04",
-                            NombreDistrital = "Villa Altagracia"
-                        },
-                        new
-                        {
-                            DistritoId = 23,
-                            CodigoDistrito = "06",
-                            CodigoRegional = "04",
-                            NombreDistrital = "Haina"
-                        },
-                        new
-                        {
-                            DistritoId = 24,
-                            CodigoDistrito = "07",
-                            CodigoRegional = "04",
-                            NombreDistrital = "San Gregorio De Nigua"
-                        },
-                        new
-                        {
-                            DistritoId = 25,
-                            CodigoDistrito = "03",
-                            CodigoRegional = "05",
-                            NombreDistrital = "La Romana"
-                        },
-                        new
-                        {
-                            DistritoId = 26,
-                            CodigoDistrito = "04",
-                            CodigoRegional = "05",
-                            NombreDistrital = "Hato Mayor"
-                        },
-                        new
-                        {
-                            DistritoId = 27,
-                            CodigoDistrito = "06",
-                            CodigoRegional = "05",
-                            NombreDistrital = "Consuelo"
-                        },
-                        new
-                        {
-                            DistritoId = 28,
-                            CodigoDistrito = "10",
-                            CodigoRegional = "05",
-                            NombreDistrital = "Guaymate"
                         });
                 });
 
@@ -645,72 +480,6 @@ namespace ProyectoFinalDotNet8.Migrations
                             RegionId = 2,
                             CodigoRegional = "07",
                             NombreRegion = "San Francisco de Macorís"
-                        },
-                        new
-                        {
-                            RegionId = 3,
-                            CodigoRegional = "08",
-                            NombreRegion = "Santiago"
-                        },
-                        new
-                        {
-                            RegionId = 4,
-                            CodigoRegional = "10",
-                            NombreRegion = "Santo Domingo"
-                        },
-                        new
-                        {
-                            RegionId = 5,
-                            CodigoRegional = "11",
-                            NombreRegion = "Puerto Plata"
-                        },
-                        new
-                        {
-                            RegionId = 6,
-                            CodigoRegional = "12",
-                            NombreRegion = "Higuey"
-                        },
-                        new
-                        {
-                            RegionId = 7,
-                            CodigoRegional = "14",
-                            NombreRegion = "Nagua"
-                        },
-                        new
-                        {
-                            RegionId = 8,
-                            CodigoRegional = "16",
-                            NombreRegion = "Cotui"
-                        },
-                        new
-                        {
-                            RegionId = 9,
-                            CodigoRegional = "01",
-                            NombreRegion = "Barahona"
-                        },
-                        new
-                        {
-                            RegionId = 10,
-                            CodigoRegional = "02",
-                            NombreRegion = "San Juan De La Maguana"
-                        },
-                        new
-                        {
-                            RegionId = 11,
-                            CodigoRegional = "03",
-                            NombreRegion = "Azua"
-                        },
-                        new
-                        {
-                            RegionId = 12,
-                            CodigoRegional = "04",
-                            NombreRegion = "San Cristobal"
-                        },
-                        new
-                        {
-                            RegionId = 13,
-                            CodigoRegional = "05",
-                            NombreRegion = "San Pedro De Macoris"
                         });
                 });
 

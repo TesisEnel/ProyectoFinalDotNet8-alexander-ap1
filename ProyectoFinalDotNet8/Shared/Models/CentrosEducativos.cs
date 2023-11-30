@@ -13,12 +13,14 @@ namespace Shared.Models
         public int CentroEducativoId { get; set; }
         [Required(ErrorMessage = "Debes de poner el nombre del Centro Educativo")]
         public string? Nombre { get; set; }
-        [Required(ErrorMessage = "Debes de poner la cantidad de estudiantes matricualdos")]
+        [Range(1, int.MaxValue, ErrorMessage = "La cantidad de estudiantes matriculados debe de ser mayor a 0")]
         public int CantidadMatricula { get; set; }
+        public string? DirectorId { get; set; }
+        [Required(ErrorMessage = "Debes de poner el código distrital del Centro Educativo")]
         public string? CodigoDistrital { get; set; }
+        [Required(ErrorMessage = "Debes de poner el código regional del Centro Educativo")]
         public string? CodigoRegional { get; set; }
         [Required(ErrorMessage = "Debes de poner la dirección del Centro Educativo")]
         public string? Direccion { get; set; }
-        //creo que debo crear el codigo regional y distrital en OnMelCreating
     }
 }

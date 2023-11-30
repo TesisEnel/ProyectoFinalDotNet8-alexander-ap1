@@ -12,7 +12,7 @@ namespace Shared.Models
     {
         [Key]
         public int TipoComidaId { get; set; }
-        public string Tipo { get; set; }
+        public string? Tipo { get; set; }
     }
     //public enum TiposComidas
     //{

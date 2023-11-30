@@ -1,4 +1,6 @@
 ﻿//using Microsoft.AspNetCore.Http;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoFinalDotNet8.Client;
@@ -25,6 +27,18 @@ namespace ProyectoFinalDotNet8.Controllers
             return await _context.Users.ToListAsync();
         }
 
+        [HttpGet("RolesDirector")]
+        public async Task<ActionResult<IEnumerable<String>>> GetRole()
+        {
+            var Director = (await _context.Roles
+                .FirstOrDefaultAsync(r => r.Name == "Director"))!.Id;
+            var roleUser = await _context.UserRoles
+                .Where(r => r.RoleId == Director)
+                .ToListAsync();
+            var Directores = roleUser.Select(r => r.UserId).ToList();
+           
+            return Directores!;
+        }
         // GET: api/User/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ApplicationUser>> GetUser(string id)
@@ -38,6 +52,7 @@ namespace ProyectoFinalDotNet8.Controllers
 
             return user;
         }
+
 
     }
 }

@@ -1,7 +1,10 @@
-﻿@rendermode InteractiveAuto
+﻿@rendermode InteractiveServer
 @attribute [Authorize(Roles = "Admin")]
 @page "/RegistroCentroEducativo"
 @page "/RegistroCentroEducativo/{CentroEducativoId:int}"
+@using ProyectoFinalDotNet8.Data
+@using Radzen.Blazor
+@using Shared.Models
 @inject NotificationService notificationService
 @inject HttpClient httpClient
 
@@ -51,15 +54,26 @@
                     </div>
                     <div class="col">
                         <label>C&oacutedigo Distrital:</label>
-                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoDistrital" @onclick="AsignarRegion" >
+                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoDistrital" @onclick="AsignarRegion">
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in ListDistritos)
                             {
                                 <option value="@item.CodigoDistrito">@item.NombreDistrital</option>
-                            }                    
+                            }
                         </InputSelect>
                         <ValidationMessage For="@(() => centroEducativo.CodigoDistrital)" />
-                    </div>                    
+                    </div>
+                    <div class="col">
+                        <label>Director:</label>
+                        <InputSelect class="form-select" @bind-Value="centroEducativo.DirectorId">
+                            <option value="" selected>Seleccione</option>
+                            @foreach (var item in Directores)
+                            {
+                                <option value="@item">@BuscarNombreDirecotor(item)</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => centroEducativo.DirectorId)" />
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col">
@@ -84,13 +98,17 @@
 
     public List<Distritos> ListDistritos { get; set; } = new();
     public List<Regiones> ListRegiones { get; set; } = new();
-
+    public List<ApplicationUser> Usuarios { get; set; } = new();
+    public List<string> Directores { get; set; } = new();
     public CentrosEducativos centroEducativo { get; set; } = new CentrosEducativos();
 
     protected override async Task OnInitializedAsync()
     {
+        Directores = (await httpClient.GetFromJsonAsync<List<string>>("api/Usuers/RolesDirector"))!;
         ListDistritos = (await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos"))!;
         ListRegiones = (await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones"))!;
+        Usuarios = (await httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/Usuers"))!;
+
         if (CentroEducativoId > 0)
         {
             centroEducativo.CentroEducativoId = CentroEducativoId;
@@ -113,13 +131,13 @@
         notificationService.Notify(mensaje);
     }
 
-    // private void StateHasChanged()
-    // {
-    //     InvokeAsync(() => base.StateHasChanged());
-    // }
     public async Task Buscar()
     {
-        var centroEducativoEncontrado = await httpClient.GetFromJsonAsync<CentrosEducativos>($"api/CentrosEducativos/{centroEducativo.CentroEducativoId}");
+        var centrosEducativos = await httpClient
+        .GetFromJsonAsync<List<CentrosEducativos>>($"api/CentrosEducativos");
+        var centroEducativoEncontrado = centrosEducativos!
+        .FirstOrDefault(c => c.CentroEducativoId == centroEducativo.CentroEducativoId);
+
         if (centroEducativoEncontrado != null)
         {
             centroEducativo = centroEducativoEncontrado;
@@ -138,9 +156,14 @@
         }
     }
 
+    public string BuscarNombreDirecotor(string UserId)
+    {
+        return Usuarios.FirstOrDefault(u => u.Id == UserId)?.UserName ?? "No encontrado";
+    }
+
     public async Task Guardar()
-    {             
-        using var response  = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);      
+    {
+        using var response = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -216,7 +239,7 @@
     public void AsignarRegion()
     {
         if (!string.IsNullOrEmpty(centroEducativo.CodigoDistrital))
-        {            
+        {
             centroEducativo.CodigoRegional = ListDistritos
             .FirstOrDefault(d => d.CodigoDistrito == centroEducativo.CodigoDistrital)?.CodigoRegional;
             StateHasChanged();

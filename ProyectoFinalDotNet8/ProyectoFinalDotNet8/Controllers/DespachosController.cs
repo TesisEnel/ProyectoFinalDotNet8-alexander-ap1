@@ -36,7 +36,8 @@ namespace ProyectoFinalDotNet8.Controllers
             {
                 return NotFound();
             }
-            var despacho = await _context.Despachos.Include(Dd => Dd.DespachoDetalles)
+            var despacho = await _context.Despachos
+                .Include(Dd => Dd.DespachoDetalles)
                 .Where(d => d.DespachoId == id)
                 .FirstOrDefaultAsync();
 
@@ -85,10 +86,14 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpPost]
         public async Task<ActionResult<Despacho>> PostDespacho(Despacho despacho)
         {
-            _context.Despachos.Add(despacho);
+            if (!DespachoExists(despacho.DespachoId))
+                _context.Despachos.Add(despacho);
+            else
+                _context.Despachos.Update(despacho);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDespacho", new { id = despacho.DespachoId }, despacho);
+            return Ok(despacho);
         }
 
         // DELETE: api/Despachos/5

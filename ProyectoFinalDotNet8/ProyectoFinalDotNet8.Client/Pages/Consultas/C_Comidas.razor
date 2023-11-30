@@ -75,9 +75,11 @@
                                 }
                             </tbody>
                             <tfoot>
-                                <th>
-                                    Conteo: @Conteo
-                                </th>
+                                <tr>
+                                    <th>
+                                        Conteo: @Conteo
+                                    </th>
+                                </tr>                                
                             </tfoot>
                         </table>
                     </div>
@@ -133,7 +135,7 @@
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(t => t.Descripcion
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(t => t.Descripcion!
                         .Contains(ComidaAuxiliar.Descripcion, StringComparison.OrdinalIgnoreCase)).ToList();
                     StateHasChanged();
                 }

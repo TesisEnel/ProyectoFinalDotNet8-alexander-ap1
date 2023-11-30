@@ -77,13 +77,11 @@
                                     }       
                                         <p><strong>D&iacute;a de la semana:</strong> @menu.DiaSemana</p>                                       
                                         <strong> Nota promedio: </strong>
-                                            @if(menu.ComenentarioDetalle.Count > 0)
-                                            {
-                                                @for (int i = 0; i < menu.ComenentarioDetalle.Average(c => c.Nota); i++)
-                                                {
-                                                    <i class="bi bi-star-fill"></i>
-                                                }
-                                            }                                          
+                                        @if(menu.ComenentarioDetalle.Count > 0)
+                                        @for (int i = 0; i < menu.ComenentarioDetalle.Average(c => c.Nota); i++)
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
 
                                         <br />
                                         @* <button class="btn btn-primary" href="RegistroComida/@tabla.ComidaId">Editar</button> *@
@@ -92,7 +90,7 @@
                                         @* <a href="/RegistroMenu/@menu.MenuId"><button type="button" class="btn btn-primary"><i class="oi oi-plus"> Editar</i></button></a>
                                         <a href="/Comentarios/@menu.MenuId"><button type="button" class="btn btn-warning"><i class="oi oi-plus"> Comentar</i></button></a> *@
 
-                                        
+                                          
 
                                 </div> 
                             </div>
@@ -124,7 +122,8 @@
         Comidas = comidas;
         var comentarios = await httpClient.GetFromJsonAsync<List<Comentarios>>("api/menus/Comentarios") ?? new List<Comentarios>();
         Comentarios = comentarios;
-        await Buscar();
+        Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
+        
     }
 
     public async Task Buscar()
