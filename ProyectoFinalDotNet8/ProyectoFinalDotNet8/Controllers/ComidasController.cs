@@ -78,10 +78,14 @@ namespace ProyectoFinalDotNet8.Controllers
         [HttpPost]
         public async Task<ActionResult<Comidas>> PostComidas(Comidas comidas)
         {
-            _context.Comidas.Add(comidas);
+            if (!ComidasExists(comidas.ComidaId))
+                _context.Comidas.Add(comidas);
+            else
+                _context.Comidas.Update(comidas);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetComidas", new { id = comidas.ComidaId }, comidas);
+            return Ok(comidas);
         }
 
         // DELETE: api/Comidas/5
