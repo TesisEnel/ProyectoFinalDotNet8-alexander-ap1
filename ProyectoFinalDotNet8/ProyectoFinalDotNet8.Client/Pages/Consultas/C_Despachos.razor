@@ -15,23 +15,21 @@
                         <label>Filtrar por</label>
                         <div class="col">
                             <InputSelect class="form-select" @bind-Value="opciones">
-                                <option value="0" selected>ID</option>
+                                <option value="0" selected>Buscar todo</option>
                                 <option value="1">Fecha</option>
                                 <option value="2">Men&uacute;</option>
                                 <option value="3">Centro Educativo</option>
                             </InputSelect>
                         </div>
                         <div class="col input-group">
-                            <button class="form-control oi oi-magnifying-glass" type="button" @onclick="Buscar"></button>
+                            <button class="form-control bi bi-search" type="button" @onclick="Buscar"></button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
                             @switch (opciones)
                             {
-                                case 0:
-                                    <InputNumber class="form-control" @bind-Value="DespachoAuxiliar.DespachoId"></InputNumber>
-                                    break;
+                                
                                 case 1:
                                     <InputDate class="form-control" @bind-Value="DespachoAuxiliar.Fecha"></InputDate>
                                     break;
@@ -55,50 +53,109 @@
                         </div>
                     </div>
                 </div>
+
+
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <div class="col">
-                            <h3>Listados de men&uacute;</h3>
+                            <h3>Listados de despachos: </h3>
+
+                        </div>
+
+
+                        @foreach (var despacho in Despachos)
+                        {
+                            if (despacho.ConfirmacionEntrega == false)
+                            {
+                                <div class="card">
+                                    <div class="container mt-5">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                @if (ObtenerImagen(despacho.MenuId) != null)
+                                                {
+                                                    var base64 = Convert.ToBase64String(ObtenerImagen(despacho.MenuId));
+                                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
+                                                    <img src="@imgSrc" alt="Imagen del producto" class="rounded mx-auto d-block img-fluid" style="max-width: 300px; max-height: 300px; margin: 5px;" />
+                                                }
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h2>@ObtenerNombreCentroEducativo(despacho.CentroEducativoId)</h2>
+                                                <p><strong>Men&uacute;:</strong> @ObtenerNombreMenu(despacho.MenuId)</p>
+                                                <strong>Descripc&iacute;on:</strong>
+                                                @foreach (var comida in ObtenerMenuDetalles(despacho.MenuId))
+                                                {
+                                                    <p class="text-muted">@ObtenerDescripcionComida(comida.ComidaId)</p>
+                                                }
+                                                <p><strong>Fecha de despacho: </strong> @despacho.Fecha.ToString("dd/MMM/yyyy")</p>
+                                                <p><strong>Hora de despacho: </strong> @despacho.Fecha.ToString("hh:mmtt")</p>
+
+                                                <button type="button" @onclick="(() => EditarDespacho(despacho.DespachoId))" class="btn btn-primary">Editar</button>
+                                                <button type="button" @onclick="(() => EliminarDespacho(despacho.DespachoId))" class="btn btn-danger">Eliminar</button>
+
+                                            </div>
+                                        </div>
+                                        <div class="row mt-5">
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+
+                        }
+                    </div>
+                </div>
+
+
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <div class="col">
+                            <h3>Listados de despachos confirmados: </h3>
 
                         </div>
 
                         @foreach (var despacho in Despachos)
                         {
-                            <div class="card">
-                                <div class="container mt-5">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            @if (ObtenerImagen(despacho.MenuId) != null)
-                                            {
-                                                var base64 = Convert.ToBase64String(ObtenerImagen(despacho.MenuId));
-                                                var imgSrc = $"data:image/jpeg;base64,{base64}";
-                                                <img src="@imgSrc" alt="Imagen del producto" class="rounded mx-auto d-block img-fluid" style="max-width: 300px; max-height: 300px; margin: 5px;" />
-                                            }
+                            if(despacho.ConfirmacionEntrega == true)
+                            {
+                                <div class="card">
+                                    <div class="container mt-5">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                @if (ObtenerImagen(despacho.MenuId) != null)
+                                                {
+                                                    var base64 = Convert.ToBase64String(ObtenerImagen(despacho.MenuId));
+                                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
+                                                    <img src="@imgSrc" alt="Imagen del producto" class="rounded mx-auto d-block img-fluid" style="max-width: 300px; max-height: 300px; margin: 5px;" />
+                                                }
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h2>@ObtenerNombreCentroEducativo(despacho.CentroEducativoId)</h2>
+                                                <p><strong>Men&uacute;:</strong> @ObtenerNombreMenu(despacho.MenuId)</p>
+                                                <strong>Descripc&iacute;on:</strong>
+                                                @foreach (var comida in ObtenerMenuDetalles(despacho.MenuId))
+                                                {
+                                                    <p class="text-muted">@ObtenerDescripcionComida(comida.ComidaId)</p>
+                                                }
+                                                <p><strong>Fecha de despacho: </strong> @despacho.Fecha.ToString("dd/MMM/yyyy")</p>
+                                                <p><strong>Hora de despacho: </strong> @despacho.Fecha.ToString("hh:mmtt")</p>
+                                                <p><strong>Fecha de recepci&oacute;n: </strong>@despacho.FechaRecepcion.ToString("dd/MMM/yyyy")</p>
+                                                <p><strong>Hora de recepci&oacute;n: </strong>@despacho.FechaRecepcion.ToString("hh:mmtt")</p>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <h2>@ObtenerNombreCentroEducativo(despacho.CentroEducativoId)</h2>
-                                            <p><strong>Men&uacute;:</strong> @ObtenerNombreMenu(despacho.MenuId)</p>
-                                            <strong>Descripc&iacute;on:</strong>
-                                            @foreach (var comida in ObtenerMenuDetalles(despacho.MenuId))
-                                            {
-                                                <p class="text-muted">@ObtenerDescripcionComida(comida.ComidaId)</p>
-                                            }
-                                            <p><strong>Fecha de despacho:</strong> @despacho.Fecha.ToString("dd/MMM/yyyy")</p>
-                                            <p><strong>Hora de despacho:</strong> @despacho.Fecha.ToString("hh:mmtt")</p>
-
-                                            <button type="button" @onclick="(() => EditarDespacho(despacho.DespachoId))" class="btn btn-primary">Editar</button>
-                                            <button type="button" @onclick="(() => EliminarDespacho(despacho.DespachoId))" class="btn btn-danger">Eliminar</button>
-
+                                        <div class="row mt-5">
                                         </div>
-                                    </div>
-                                    <div class="row mt-5">
                                     </div>
                                 </div>
-                            </div>
+                            }
+                            
 
                         }
                     </div>
                 </div>
+
+
 
             </div>
         </div>
@@ -127,16 +184,8 @@
         {
             switch (opciones)
             {
-                case 0:
-                    if (DespachoAuxiliar.DespachoId == 0)
-                    {
-                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
-                    }
-                    else
-                    {
-                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
-                            .Where(d => d.DespachoId == DespachoAuxiliar.DespachoId).ToList();
-                    }
+                case 0:                  
+                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;                   
                     break;
 
                 case 1:
@@ -202,8 +251,14 @@
     public List<MenuDetalles> ObtenerMenuDetalles(int Id)
     {
         var menu = Menus.FirstOrDefault(m => m.MenuId == Id);
-        return menu?.MenuDetalles.ToList()!;
+        return menu?.MenuDetalles.ToList()?? new List<MenuDetalles>() ;
     }
+    // public async Task<List<MenuDetalles>> ObtenerMenuDetallesAsync(int Id)
+    // {
+    //     var menu = await Task.Run(() => Menus.FirstOrDefault(m => m.MenuId == Id)); 
+    //     return menu?.MenuDetalles.ToList() ?? new List<MenuDetalles>();
+    // }
+
     public byte[] ObtenerImagen(int Id)
     {
         var menu = Menus.FirstOrDefault(m => m.MenuId == Id);
