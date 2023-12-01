@@ -121,7 +121,7 @@
         catch
         {
             throw new InvalidOperationException($"No se puede crear una instancia de'{nameof(ApplicationUser)}'. " +
-                $"Ensure that '{nameof(ApplicationUser)}' no es una clase abstracta y tiene un constructor sin parámetros.");
+                $"Asegurese de que '{nameof(ApplicationUser)}' no es una clase abstracta y tiene un constructor sin parámetros.");
         }
     }
 
