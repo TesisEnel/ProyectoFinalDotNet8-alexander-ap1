@@ -98,6 +98,19 @@ namespace ProyectoFinalDotNet8.Controllers
             return Ok(menu);
         }
 
+        [HttpPost("Comentarios")]
+        public async Task<ActionResult<Menu>> PostComentarios(Comentarios comentarios)
+        {
+            if (!ComentarioExists(comentarios.ComentarioId))
+                _context.Comentarios.Add(comentarios);
+            else
+                _context.Comentarios.Update(comentarios);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(comentarios);
+        }
+
         // DELETE: api/Menus/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMenu(int id)
@@ -117,6 +130,10 @@ namespace ProyectoFinalDotNet8.Controllers
         private bool MenuExists(int id)
         {
             return _context.Menus.Any(e => e.MenuId == id);
+        }
+        private bool ComentarioExists(int id)
+        {
+            return _context.Comentarios.Any(e => e.ComentarioId == id);
         }
         [HttpGet("Comentarios")]
         public async Task<ActionResult<IEnumerable<Comentarios>>> GetComentarios()
