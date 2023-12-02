@@ -4,7 +4,7 @@
 @using ProyectoFinalDotNet8.Data
 @using Shared.Models
 @inject HttpClient httpClient
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Director")]
 @inject AuthenticationStateProvider authenticationStateProvider
 
 

@@ -14,7 +14,10 @@
 <div class="container py-5 px-4">
     <!-- For demo purpose-->
     @* <header class="text-center"> *@
+        <div class="modal-dialog-scrollable">
             <div class="card">
+                <a href="ConsultaMenu" class="btn btn-dark btn-rounded test" data-mdb-ripple-init role="button" aria-pressed="true"><i class="bi bi-arrow-left-circle"></i></a>
+
                 <div class="container mt-5">
                     <div class="row">
                         <div class="col-md-6">
@@ -36,9 +39,21 @@
                             <strong> Nota promedio: </strong>
                             @if (Menu.ComenentarioDetalle.Any())
                             {
-                                @for (int i = 0; i < Menu.ComenentarioDetalle.Average(c => c.Nota); i++)
+                                @if (Menu.ComenentarioDetalle.Count > 0)
                                 {
-                                    <i class="bi bi-star-fill"></i>
+                                    @for (int i = 0; i < 5; i++)
+                                    {
+                                        if (i < Menu.ComenentarioDetalle.Average(c => c.Nota))
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star text-warning"></i>
+                                        }
+
+                                    }
                                 }
                             }
                         </div>
@@ -47,141 +62,146 @@
                     </div>
                 </div>
             </div>
-
-        <!-- Área de chat -->
-        <div class="col px-0">
-            <div class="px-5 py-5 chat-box bg-white">
-                <!-- Puedes continuar iterando sobre tus comentarios y mostrarlos en el área de chat -->
-                @foreach (var comentario in ComentariosEnviados)
-                {
-
-                    @if (AuthState?.User?.Identity?.Name == comentario.Usuario)
+            
+            <!-- Área de chat -->
+            <div class="card">
+                <div class="col px-0">
+                    @if (AuthState?.User?.Identity?.Name != null)
                     {
 
-                        <div class="row justify-content-end">
+                    <div class="px-5 py-5 chat-box bg-white">
+                        <!-- Puedes continuar iterando sobre tus comentarios y mostrarlos en el área de chat -->
+                        @foreach (var comentario in ComentariosEnviados)
+                        {
 
-                            <div class="container text-end d-flex flex-column align-items-end">
-
-                                <div>
-                                    <!-- Imagen -->
-                                    <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
-
-                                </div>
-                                @if (AuthState is not null)
-                                {
-                                    <strong>@AuthState?.User?.Identity?.Name</strong>
-                                }
-                                <!-- Nombre de usuario -->
-
-                                <div class="media-body col-auto">
-                                    <!-- Contenedor comenatrio -->
-                                    <div class="bg-info rounded-2 w-100">
-
-                                        <p class="text-muted m-0 text-break align-items-start">
-                                            @comentario.ComentarioTexto
-                                        </p>
-
-                                    </div>
-
-                                    <p class="small text-muted text-right">
-                                        @comentario.Fecha.ToString("hh:mm tt | dd MMM")
-                                    </p>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    }
-                    else
-                    {
-
-                        <div class="row justify-content-start">
-
-                            <div class="container text-start d-flex flex-column align-items-start">
-
-                                <div>
-                                    <!-- Imagen -->
-                                    <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
-
-                                </div>
-                                @if (AuthState is not null)
-                                {
-                                    <strong>@AuthState?.User?.Identity?.Name</strong>
-                                }
-                                <!-- Nombre de usuario -->
-
-                                <div class="media-body col-auto">
-                                    <!-- Contenedor comenatrio -->
-                                    <div class="bg-light rounded-2 w-100">
-
-                                        <p class="text-muted m-0 text-break">
-                                            @comentario.ComentarioTexto
-                                        </p>
-
-                                    </div>
-
-                                    <p class="small text-muted text-right">
-                                        @comentario.Fecha.ToString("hh:mm tt | dd MMM")
-                                    </p>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-
-                       @*  <div class="row justify-content-start">
-                            <div class="media w-50 mb-3">
-                                <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" class="rounded-circle">
-                            </div>
-
-                            @if (AuthState is not null)
+                            @if (AuthState?.User?.Identity?.Name == comentario.Usuario)
                             {
-                                <strong>@comentario.Usuario</strong>
+
+                                <div class="row justify-content-end">
+
+                                    <div class="container text-end d-flex flex-column align-items-end">
+
+                                        <div>
+                                            <!-- Imagen -->
+                                            <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
+
+                                        </div>
+                                        <div>
+
+                                            @for (int i = 0; i < 5; i++)
+                                            {
+                                                if (i < comentario.Nota)
+                                                {
+                                                    <i class="bi bi-star-fill text-warning"></i>
+
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star text-warning"></i>
+                                                }
+
+                                            }
+
+                                        </div>
+
+                                        <strong>@comentario.Usuario</strong>
+
+                                        <!-- Nombre de usuario -->
+
+                                        <div class="media-body col-auto">
+                                            <!-- Contenedor comenatrio -->
+                                            <div class="bg-info rounded-2 w-100">
+
+                                                <p class="text-muted m-0 text-break align-items-start">
+                                                    @comentario.ComentarioTexto
+                                                </p>
+
+                                            </div>
+
+                                            <p class="small text-muted text-right">
+                                                @comentario.Fecha.ToString("hh:mm tt | dd MMM")
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
                             }
+                            else
+                            {
 
+                                <div class="row justify-content-start">
 
-                            <div class="media-body col-auto">
+                                    <div class="container text-start d-flex flex-column align-items-start">
 
-                                <div class="bg-light rounded-2">
+                                        <div>
+                                            <!-- Imagen -->
+                                            <img src="https://bootstrapious.com/i/snippets/sn-chat/avatar.svg" alt="user" width="50" height="50" class="rounded-circle">
 
-                                    <p class="text-small mb-0 text-muted overflow-hidden h-100">
-                                        @comentario.ComentarioTexto
-                                    </p>
+                                        </div>
+                                        <div>
+
+                                            @for (int i = 0; i < 5; i++)
+                                            {
+                                                if (i < comentario.Nota)
+                                                {
+                                                    <i class="bi bi-star-fill text-warning"></i>
+
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star text-warning"></i>
+                                                }
+
+                                            }
+
+                                        </div>
+                                        <strong>@comentario.Usuario</strong>
+
+                                        <div class="media-body col-auto">
+                                            <!-- Contenedor comenatrio -->
+                                            <div class="bg-light rounded-2 w-100">
+
+                                                <p class="text-muted m-0 text-break">
+                                                    @comentario.ComentarioTexto
+                                                </p>
+
+                                            </div>
+
+                                            <p class="small text-muted text-right">
+                                                @comentario.Fecha.ToString("hh:mm tt | dd MMM")
+                                            </p>
+                                        </div>
+
+                                    </div>
 
                                 </div>
-
-                                <p class="small text-muted">
-                                    @comentario.Fecha.ToString("hh:mm tt | dd MMM")
-                                </p>
-
-                            </div> *@
-
-
-
-                           @*  <div class="media-body col-auto ">
-                                <div class="bg-light rounded 2 ">
-                                    <p class="text-small mb-0 text-muted">@comentario.ComentarioTexto</p>
-                                </div>
-                                <p class="small text-muted">@comentario.Fecha.ToString("hh:mm tt | dd MMM")</p>
-                            </div> 
-                        </div>*@
-                    }                    
-                }
-            </div>
-
-            <!-- Área de escritura -->
-            @* <form action="#" class="bg-light"> *@
-                <div class="input-group">
-                    <div class="input-group">
-                        <input type="text" placeholder="Escribe un comentario" aria-describedby="button-addon2"@bind-value="comentario.ComentarioTexto" class="form-control rounded-0 border-0 py-4 bg-light">
-                        <button type="submit" class="btn btn-info btn-rounded float-end" >Send</button>
+                            }
+                        }
                     </div>
+                    }
+
+                    <div class="input-group">
+                        <div class="mb-3 ">
+                            <label class="form-label">Calificación</label>
+                            <select class="form-select" @bind="comentario.Nota">
+                                <option value="1" selected>&#9733;</option>
+                                <option value="2">&#9733; &#9733;</option>
+                                <option value="3">&#9733; &#9733; &#9733;</option>
+                                <option value="4">&#9733; &#9733; &#9733; &#9733;</option>
+                                <option value="5">&#9733; &#9733; &#9733; &#9733; &#9733;</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" placeholder="Escribe un comentario" aria-describedby="button-addon2" @bind-value="comentario.ComentarioTexto" class="form-control rounded-0 border-0 py-4 bg-light">
+                            <button type="submit" class="btn btn-info btn-rounded float-end"><i class="bi bi-send-fill"></i></button>
+                        </div>
+                    </div>
+
                 </div>
-            @* </form> *@
+            </div>
         </div>
-    @* </div> *@
+            
 </div>
 </EditForm>
 
@@ -207,7 +227,7 @@
         this.menus = menus;
         if(menuId > 0)
         {
-            await ElegirMenu(menuId, AuthState?.User?.Identity?.Name!);
+            await ElegirMenu(menuId, AuthState?.User?.Identity?.Name ?? string.Empty);
         }
         // podiras poner una lista con todos lo comentarios acerca del  menu
     }
@@ -221,10 +241,9 @@
         Menu = menu!;
         ComentariosEnviados = comentarios;
         comentario.MenuId = menuId;
-        comentario.Nota = 2;
         comentario.Fecha = DateTime.Now;
-        comentario.Usuario = user!.UserName;
-        comentario.UsuarioId = user.Id;
+        comentario.Usuario = user?.UserName ?? string.Empty;
+        comentario.UsuarioId = user?.Id ?? string.Empty;
         menuActual = menuId;
     }
 
@@ -236,7 +255,6 @@
         Menu = menu!;
         ComentariosEnviados = comentarios;
         comentario.MenuId = menuId;
-        comentario.Nota = 2;
         comentario.Fecha = DateTime.Now;
         comentario.Usuario = user!.UserName;
         comentario.UsuarioId = user.Id;
@@ -277,9 +295,9 @@
             notificationService.Notify(mensaje);
             ComentariosEnviados = (await httpClient.GetFromJsonAsync<List<Comentarios>>("api/Menus/Comentarios"))!.Where(c => c.MenuId == menuActual).ToList();
             StateHasChanged();
-
-
         }
+        StateHasChanged();
+
     }
     public void Nuevo()
     {

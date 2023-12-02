@@ -1,7 +1,7 @@
 ﻿@page "/ConsultaComida"
 @inject HttpClient httpClient
 @rendermode InteractiveAuto
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin,Empleado")]
 
 <div>
     <div class="row justify-content-start ">

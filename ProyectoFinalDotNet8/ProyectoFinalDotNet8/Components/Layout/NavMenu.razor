@@ -30,7 +30,7 @@
             </NavLink>
         </div>
 
-        <AuthorizeView>
+        <AuthorizeView Roles="Director, Empleado, Admin">
             <Authorized>
                 <div class="nav-item px-0">
                     <NavLink class="nav-link" href="ConsultaComida">
@@ -92,18 +92,7 @@
                 </div>
             </Authorized>
 
-            <NotAuthorized>
-                <div class="nav-item px-0">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-0">
-                    <NavLink class="nav-link" href="">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
+            
         </AuthorizeView>
 
         <AuthorizeView>
@@ -123,6 +112,19 @@
                     </form>
                 </div>
             </Authorized>
+
+            <NotAuthorized>
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="Account/Register">
+                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                    </NavLink>
+                </div>
+                <div class="nav-item px-0">
+                    <NavLink class="nav-link" href="">
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+            </NotAuthorized>
         </AuthorizeView>
     </nav>
 </div>

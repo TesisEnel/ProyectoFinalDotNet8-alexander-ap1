@@ -2,8 +2,7 @@
 @inject NavigationManager NavigationManager
 @page "/ConsultaDespacho"
 @inject HttpClient httpClient
-@attribute [Authorize]
-
+@attribute [Authorize(Roles = "Admin,Empleado")]
 
 <div>
     <div class="row justify-content-start ">
