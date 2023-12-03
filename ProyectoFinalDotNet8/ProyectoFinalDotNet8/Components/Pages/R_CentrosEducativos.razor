@@ -43,7 +43,7 @@
                 <div class="row">
                     <div class="col">
                         <label>C&oacutedigo Regional:</label>
-                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoRegional" @oninput="AsignarDistrito">
+                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoRegional" @onclick="AsignarDistrito">
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in ListRegiones)
                             {
@@ -54,11 +54,11 @@
                     </div>
                     <div class="col">
                         <label>C&oacutedigo Distrital:</label>
-                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoDistrital" @onclick="AsignarRegion">
+                        <InputSelect class="form-select" @bind-Value="DistritoId" @onclick="AsignarRegion">
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in ListDistritos)
                             {
-                                <option value="@item.CodigoDistrito">@item.NombreDistrital</option>
+                                <option  value="@item.DistritoId">@item.NombreDistrital</option>
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => centroEducativo.CodigoDistrital)" />
@@ -101,6 +101,7 @@
     public List<ApplicationUser> Usuarios { get; set; } = new();
     public List<string> Directores { get; set; } = new();
     public CentrosEducativos centroEducativo { get; set; } = new CentrosEducativos();
+    public int DistritoId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,6 +120,7 @@
 
     void Nuevo()
     {
+        DistritoId = 0;
         centroEducativo = new CentrosEducativos();
 
         var mensaje = new NotificationMessage
@@ -163,6 +165,7 @@
 
     public async Task Guardar()
     {
+        centroEducativo.CodigoDistrital = BuscarCodigoDistrital(DistritoId);
         using var response = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);
 
         if (!response.IsSuccessStatusCode)
@@ -236,14 +239,20 @@
             notificationService.Notify(mensaje);
         }
     }
+
+   
     public void AsignarRegion()
     {
-        if (!string.IsNullOrEmpty(centroEducativo.CodigoDistrital))
+        var distrito = ListDistritos.Where(d => d.DistritoId == DistritoId).FirstOrDefault();
+        if (distrito != null)
         {
-            centroEducativo.CodigoRegional = ListDistritos
-            .FirstOrDefault(d => d.CodigoDistrito == centroEducativo.CodigoDistrital)?.CodigoRegional;
+            centroEducativo.CodigoRegional = distrito!.CodigoRegional;
             StateHasChanged();
         }
+    }
+    public string BuscarCodigoDistrital(int DistritoId)
+    {
+        return ListDistritos.FirstOrDefault(d => d.DistritoId == DistritoId)?.CodigoDistrito ?? "No encontrado";
     }
     public async Task AsignarDistrito()
     {

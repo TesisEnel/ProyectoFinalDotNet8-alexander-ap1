@@ -53,15 +53,7 @@
                                 </InputSelect>
                                 <ValidationMessage For="@(() => MenuDetalle.DetalleId)" />
                             </div>
-                            <div class="row">
-                                <div class="col">
-
-                                    <label class="form-label" for="Foto"><i class="oi oi-puzzle-piece" /> Foto:</label>
-                                    <InputFile OnChange="CargarImagen" class="form-control" accept=".png, .jpg, .jpeg" />
-                                    <ValidationMessage For="@(() => Menu.Imagen)" />
-
-                                </div>
-                            </div>
+                            
                             <div class="col-md-5">
                                 <label>Cantidad</label>
                                 <div class="row">
@@ -71,6 +63,15 @@
                                         </div>
                                      </div>
                                     </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+
+                                    <label class="form-label" for="Foto"><i class="oi oi-puzzle-piece" /> Foto:</label>
+                                    <InputFile OnChange="CargarImagen" class="form-control" accept=".png, .jpg, .jpeg" />
+                                    <ValidationMessage For="@(() => Menu.Imagen)" />
+
+                                </div>
                             </div>
                         </div>
                         <div class="row">
