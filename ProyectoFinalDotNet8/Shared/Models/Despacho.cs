@@ -19,7 +19,7 @@ namespace Shared.Models
         public int MenuId { get; set; }
         public bool ConfirmacionEntrega { get; set; }
         public string? RecibidoPor { get; set; }
-        public DateTime FechaRecepcion { get; set; } = DateTime.Now;
+        public DateTime FechaRecepcion { get; set; }
         [ForeignKey("DespachoId")]
         public ICollection<DespachoDetalle> DespachoDetalles { get; set; } = new List<DespachoDetalle>();
     }
