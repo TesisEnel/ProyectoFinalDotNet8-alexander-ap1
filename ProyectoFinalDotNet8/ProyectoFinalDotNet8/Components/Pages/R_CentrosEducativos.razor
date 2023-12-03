@@ -69,7 +69,7 @@
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in Directores)
                             {
-                                <option value="@item">@BuscarNombreDirecotor(item)</option>
+                                <option value="@item">@OptenerNombreUsuario(item)</option>
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => centroEducativo.DirectorId)" />
@@ -250,10 +250,18 @@
             StateHasChanged();
         }
     }
+
+    public string OptenerNombreUsuario(string UserId)
+    {
+        return Usuarios.FirstOrDefault(u => u.Id == UserId)?.Nombre 
+        + " " + Usuarios.FirstOrDefault(u => u.Id == UserId)?.Apellidos;
+    }
+
     public string BuscarCodigoDistrital(int DistritoId)
     {
         return ListDistritos.FirstOrDefault(d => d.DistritoId == DistritoId)?.CodigoDistrito ?? "No encontrado";
     }
+
     public async Task AsignarDistrito()
     {
         var listDistritoTemporal = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos");
