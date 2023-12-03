@@ -259,7 +259,7 @@
         var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id && c.CentroEducativoId == Id);
         return centro != null;
     }
-    
+
 
 
     // public bool UsuarioCentroEducativo()
@@ -268,7 +268,12 @@
     //     var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id);
     //     return centro != null;
     // }
+    public string BuscarNombredDelUsuario()
+    {
+        var usuario = Usuarios.FirstOrDefault(u => u.Email == AuthState?.User?.Identity?.Name);
+        return usuario?.Nombre!;
 
+    }
 
 
 
@@ -283,6 +288,7 @@
             despacho!.ConfirmacionEntrega = false;
 
         despacho.FechaRecepcion = DateTime.Now;
+        despacho.RecibidoPor = BuscarNombredDelUsuario();
         var response = await httpClient.PutAsJsonAsync($"api/Despachos/{Id}", despacho);
         Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
         StateHasChanged();

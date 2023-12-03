@@ -16,8 +16,16 @@
     @* <header class="text-center"> *@
         <div class="modal-dialog-scrollable">
             <div class="card">
-                <a href="ConsultaMenu" class="btn btn-dark btn-rounded test" data-mdb-ripple-init role="button" aria-pressed="true"><i class="bi bi-arrow-left-circle"></i></a>
+                @* <a href="ConsultaMenu" class="btn btn-dark btn-rounded test" data-mdb-ripple-init role="button" aria-pressed="true"><i class="bi bi-arrow-left-circle"></i></a>
+                <button type="button" class="btn-close" data-mdb-ripple-init data-mdb-dismiss="modal" aria-label="Close"></button> *@
+                <div class="row justify-content-end">
 
+                    <div class="container text-end d-flex flex-column align-items-end">
+
+                        <a href="ConsultaMenu" class="btn-close" data-mdb-ripple-init data-mdb-dismiss="modal" role="button" aria-pressed="true"></a>
+                        @* <button type="button" class="btn-close" data-mdb-ripple-init data-mdb-dismiss="modal" aria-label="Close"></button> *@
+                    </div>
+                </div>
                 <div class="container mt-5">
                     <div class="row">
                         <div class="col-md-6">
@@ -104,7 +112,7 @@
 
                                         </div>
 
-                                        <strong>@comentario.Usuario</strong>
+                                            <strong>@ObtnerNombreUsuario(comentario.Usuario!)</strong>
 
                                         <!-- Nombre de usuario -->
 
@@ -156,7 +164,8 @@
                                             }
 
                                         </div>
-                                        <strong>@comentario.Usuario</strong>
+                                            <strong>@ObtnerNombreUsuario(comentario.Usuario!)</strong>
+                                            @* <strong>@comentario.Usuario</strong> *@
 
                                         <div class="media-body col-auto">
                                             <!-- Contenedor comenatrio -->
@@ -299,9 +308,20 @@
         StateHasChanged();
 
     }
+    // public string ObtnerNombreUsuario(string id)
+    // {
+    //     var usuario = Usuarios.FirstOrDefault(u => u.UserName == id);
+    //     return usuario?.Nombre ?? string.Empty;
+    // }
+    public string ObtnerNombreUsuario(string userName)
+    {
+        var usuario = Usuarios.FirstOrDefault(u => u.UserName!.Contains(userName));
+        return usuario?.Nombre! + " " + usuario?.Apellidos!;
+
+    }
     public void Nuevo()
     {
-        comentario = new Comentarios();
+        comentario = new Comentarios() ;
     }
     private async Task HandleValidSubmit()
     {
