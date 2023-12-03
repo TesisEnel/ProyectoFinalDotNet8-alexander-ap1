@@ -14,55 +14,67 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject HttpClient httpClient
 
-<PageTitle>Registrar</PageTitle>
+<PageTitle>Registro</PageTitle>
 
-<h1>Registrar</h1>
+<h1>Registro</h1>
+<EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+    <div class="row">
+        <div class="col-md-4">
+            <StatusMessage Message="@Message" />
 
-<div class="row">
-    <div class="col-md-4">
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
-            <h2>Crear una nueva cuenta.</h2>
+            <h2>Crea una cuenta nueva.</h2>
             <hr />
-            <ValidationSummary class="text-danger" role="alert" />
+            <h3>Datos Personales</h3>
+
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Nombre" class="form-control"  aria-required="true" placeholder="Juan" />
-                <label for="name">Nombre</label>
+                <InputText type="text" @bind-Value="Input.Nombre" class="form-control" autocomplete="nombre" aria-required="true" placeholder="Nombre" />
+                <label for="nombreCliente">Nombres</label>
                 <ValidationMessage For="() => Input.Nombre" class="text-danger" />
             </div>
+
+
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Apellidos" class="form-control"  aria-required="true" placeholder="Perez Rodriguez" />
-                <label for="lastName">Apellidos</label>
-                <ValidationMessage For="() => Input.Apellidos" class="text-danger" />
+                <InputText type="text" @bind-Value="Input.Apellido" class="form-control" autocomplete="apellido" aria-required="true" placeholder="Apellido" />
+                <label for="apellidoCliente">Apellidos</label>
+                <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
+
+
+
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label for="email">Email</label>
+                <InputDate @bind-Value="Input.FechaNacimiento" class="form-control" autocomplete="fechaNacimiento" aria-required="true" placeholder="Fecha de Nacimiento" />
+                <label for="fechaNacimientoCliente">Fecha de Nacimiento</label>
+                <ValidationMessage For="() => Input.FechaNacimiento" class="text-danger" />
+            </div>
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
+                <label for="email">Correo electrónico</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Contraseña" />
+                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="contraseña" />
                 <label for="password">Contraseña</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirmar Contraseña" />
+                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="contraseña" />
                 <label for="confirm-password">Confirmar contraseña</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Registrar</button>
-        </EditForm>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Registro</button>
+        </div>
+        <h2>¿Ya tienes una cuenta?</h2>
+        <p>
+            <a href="Account/Login">Inicia sesión</a>
+        </p>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Utilice otro servicio para registrarse.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div>
-</div>
+
+</EditForm>
+
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
@@ -75,22 +87,45 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
+    // public IEnumerable<TelefonosClientes> L_TiposTelefono { get; set; } = Enumerable.Empty<TelefonosClientes>();
+
+    // public Clientes clientes { get; set; } = new Clientes();
+    // public int tipoTelefonoSeleccionado { get; set; }
+
+    // public string nombreInsertado { get; set; } = string.Empty;
+
+    // public string telefonoInsertado { get; set; } = string.Empty;
+
+    // public string ValidacionD { get; set; } = string.Empty;
+
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await CargarTiposTelefonos();
+    // }
+
     public async Task RegisterUser(EditContext editContext)
     {
+        // using var response = await httpClient.PostAsJsonAsync("api/Clientes", clientes);
+
         var user = CreateUser();
+
+        user.Nombre = Input.Nombre;
+        user.Apellidos = Input.Apellido;
+        user.FechaNacimiento = Input.FechaNacimiento;
+
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
         var result = await UserManager.CreateAsync(user, Input.Password);
-
         if (!result.Succeeded)
         {
             identityErrors = result.Errors;
             return;
         }
 
-        Logger.LogInformation("El usuario creó una nueva cuenta con contraseña.");
+        Logger.LogInformation("User created a new account with password.");
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
@@ -110,6 +145,21 @@
 
         await SignInManager.SignInAsync(user, isPersistent: false);
         RedirectManager.RedirectTo(ReturnUrl);
+
+
+
+        // if (!response.IsSuccessStatusCode)
+        // {
+        //     return;
+        // }
+
+        // var clienteDevuelto = await response.Content.ReadFromJsonAsync<Clientes>();
+
+        // if (clienteDevuelto is not null)
+        // {
+        //     clientes = clienteDevuelto;
+        //     StateHasChanged();
+        // }
     }
 
     private ApplicationUser CreateUser()
@@ -120,8 +170,8 @@
         }
         catch
         {
-            throw new InvalidOperationException($"No se puede crear una instancia de'{nameof(ApplicationUser)}'. " +
-                $"Asegurese de que '{nameof(ApplicationUser)}' no es una clase abstracta y tiene un constructor sin parámetros.");
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
         }
     }
 
@@ -129,35 +179,105 @@
     {
         if (!UserManager.SupportsUserEmail)
         {
-            throw new NotSupportedException("La interfaz de usuario predeterminada requiere un almacén de usuarios con soporte por correo electrónico.");
+            throw new NotSupportedException("The default UI requires a user store with email support.");
         }
         return (IUserEmailStore<ApplicationUser>)UserStore;
     }
 
+
+    // public void AgregarDetalle()
+    // {
+    //     Console.WriteLine("Mio, yo estoy entrando");
+    //     if (!ValidarDetalle())
+    //     {
+    //         return;
+    //     }
+
+    //     clientes.ClientesDetalle.Add(new ClientesDetalle
+    //         {
+    //             TipoTelId = tipoTelefonoSeleccionado,
+    //             Nombre = nombreInsertado,
+    //             Telefono = telefonoInsertado
+    //         });
+    //     tipoTelefonoSeleccionado = 0;
+    //     nombreInsertado = string.Empty;
+    //     telefonoInsertado = string.Empty;
+    //     StateHasChanged();
+    // }
+
+    // public void RemoverDetalle(ClientesDetalle detalleRemover)
+    // {
+    //     tipoTelefonoSeleccionado = detalleRemover.TipoTelId;
+    //     nombreInsertado = detalleRemover.Nombre;
+    //     telefonoInsertado = detalleRemover.Telefono;
+
+    //     clientes.ClientesDetalle.Remove(detalleRemover);
+    // }
+
+    // public bool ValidarDetalle()
+    // {
+    //     ValidacionD = string.Empty;
+
+    //     if (tipoTelefonoSeleccionado <= 0)
+    //     {
+    //         ValidacionD = "El tipo de telefono es obligatorio";
+    //     }
+
+    //     if (string.IsNullOrWhiteSpace(nombreInsertado))
+    //     {
+    //         ValidacionD = "El nombre es obligatorio";
+    //     }
+
+    //     if (string.IsNullOrWhiteSpace(telefonoInsertado))
+    //     {
+    //         ValidacionD = "El numero telefonico es obligatorio";
+    //     }
+
+
+    //     return ValidacionD.Length == 0;
+    // }
+
+    // private async Task CargarTiposTelefonos()
+    // {
+    //     var encontrados = await httpClient.GetFromJsonAsync<IEnumerable<TelefonosClientes>>("api/TelefonosClientes");
+    //     if (encontrados != null)
+    //     {
+    //         L_TiposTelefono = encontrados;
+    //     }
+    // }
+
+    // public string TipoTelefono(int tipoId)
+    // {
+    //     var tipoTel = L_TiposTelefono.FirstOrDefault(t => t.TipoTelId == tipoId);
+
+    //     return tipoTel!.TipoTelefono;
+    // }
+
+
+
     private sealed class InputModel
     {
-        [Required]
-        [Display(Name = "Nombre")]
-        public string Nombre { get; set; } = "";
-
-        [Required]
-        [Display(Name = "Apellidos")]
-        public string Apellidos { get; set; } = "";
-
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
 
         [Required]
-        [StringLength(100, ErrorMessage = "El {0} debe ser al menos {2} y el máximo {1} caracteres largos.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Contraseña")]
+        [Display(Name = "Password")]
         public string Password { get; set; } = "";
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirmar contraseña")]
-        [Compare("Contraseña", ErrorMessage = "La contraseña y la contraseña de confirmacion no coinciden.")]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+
+        public string Nombre { get; set; } = string.Empty;
+
+        public string Apellido { get; set; } = string.Empty;
+
+        public DateTime FechaNacimiento { get; set; }
+
     }
 }

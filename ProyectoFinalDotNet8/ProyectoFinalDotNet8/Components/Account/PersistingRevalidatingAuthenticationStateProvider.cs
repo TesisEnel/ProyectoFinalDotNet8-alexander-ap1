@@ -90,6 +90,7 @@ namespace ProyectoFinalDotNet8.Components.Account
                 var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
                 var role = principal.FindFirst(options.ClaimsIdentity.RoleClaimType)?.Value;
                 var nombre = principal.FindFirst(options.ClaimsIdentity.UserNameClaimType)?.Value;
+                var apellidos = principal.FindFirst(options.ClaimsIdentity.UserNameClaimType)?.Value;
 
                 if (userId != null && email != null)
                 {
@@ -100,7 +101,6 @@ namespace ProyectoFinalDotNet8.Components.Account
                         Role = role!,
                         Nombre = nombre!,
                         Apellidos = string.Empty
-
                     }) ;
                 }
             }

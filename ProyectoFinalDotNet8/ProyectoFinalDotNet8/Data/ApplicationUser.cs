@@ -9,6 +9,7 @@ namespace ProyectoFinalDotNet8.Data
         public string? Role { get; set; }
         public string? Nombre { get; set; }
         public string? Apellidos { get; set; }
+        public DateTime? FechaNacimiento { get; set; }
     }
 
 }

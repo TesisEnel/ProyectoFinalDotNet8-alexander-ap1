@@ -16,16 +16,6 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <label>Despacho ID:</label>
-                        <div class=" col-auto  mb-3">
-                            <InputNumber @bind-Value="Despacho.DespachoId" class="form-control" min="0"></InputNumber>
-                            <ValidationMessage For="@(() => Despacho.MenuId)" />
-                        </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col">
                             <label>Fecha: </label>
                             <InputDate @bind-Value="Despacho.Fecha" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")"
@@ -155,17 +145,14 @@
         if (centrosEducativos!.Count > 0 )
         {
             CentrosEducativos = centrosEducativos;
-            Despacho.CentroEducativoId = centrosEducativos.First().CentroEducativoId;
         }
         if(comidas!.Count > 0)
         {
             Comidas = comidas;
-            DespachoDetalle.ComidaId = comidas!.First().ComidaId;
         }
         if(menus!.Count > 0)
         {
             Menus = menus;
-            Despacho.MenuId = menus.First().MenuId;
         }
         if (DespachoId > 0)
         {

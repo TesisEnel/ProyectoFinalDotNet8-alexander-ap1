@@ -17,16 +17,7 @@
                 <h1>Registro Comidas</h1>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <label>ID:</label>
-                    <div class=" col-auto mb-3">
-                        <InputNumber @bind-Value="Comidas.ComidaId" class="form-control" min="0"></InputNumber>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
-                    </div>
-                </div>
-                <div class="row">
+                <div class="row">               
                     <div class="col">
                         <label>Descripci&oacute;n: </label>
                         <InputText @bind-Value="Comidas.Descripcion" class="form-control"></InputText>
