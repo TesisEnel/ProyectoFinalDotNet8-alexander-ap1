@@ -16,16 +16,6 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <label>Despacho ID:</label>
-                        <div class=" col-auto  mb-3">
-                            <InputNumber @bind-Value="Despacho.DespachoId" class="form-control" min="0"></InputNumber>
-                            <ValidationMessage For="@(() => Despacho.MenuId)" />
-                        </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col">
                             <label>Fecha: </label>
                             <InputDate @bind-Value="Despacho.Fecha" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")"
@@ -68,6 +58,7 @@
                             <div class="col-md-6">
                                 <label> Comidas: </label>
                                 <InputSelect @bind-Value="DespachoDetalle.ComidaId" class="form-select">
+                                    <option value="0" selected>Seleccione</option>
                                     @foreach (var item in Comidas)
                                     {
                                         <option value="@item.ComidaId">@item.Descripcion</option>
@@ -307,43 +298,74 @@
     public void AgregarDetalle()
     {
         // if (DespachoDetalle.CantidadDecomida > 0)
-        var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula <= DespachoDetalle.CantidadDecomida;
-        var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
-        var VerificarComida = menuEncotrado!.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
-        if (VerificarCantidadComida && VerificarComida)
+        if (DespachoDetalle.ComidaId > 0 && validarEntradas())
         {
-            DespachoDetalle.DespachoId = Despacho.DespachoId;
-            Despacho.DespachoDetalles.Add(DespachoDetalle);
-            DetallesAgregado.Add(DespachoDetalle);
-            DespachoDetalle = new DespachoDetalle();
-            StateHasChanged();
+            var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula <= DespachoDetalle.CantidadDecomida;
+            var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
+            var VerificarComida = menuEncotrado!.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
+            if (VerificarCantidadComida && VerificarComida)
+            {
+                DespachoDetalle.DespachoId = Despacho.DespachoId;
+                Despacho.DespachoDetalles.Add(DespachoDetalle);
+                DetallesAgregado.Add(DespachoDetalle);
+                DespachoDetalle = new DespachoDetalle();
+                StateHasChanged();
+            }
+            else
+            {
+                if (!VerificarCantidadComida)
+                {
+                    var mensaje = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Error,
+                            Summary = "Error ",
+                            Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula} raciones)",
+                            Duration = 5_000
+                        };
+                    notificationService.Notify(mensaje);
+                }
+
+                if (!VerificarComida)
+                {
+                    var mensaje = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Error,
+                            Summary = "Error ",
+                            Detail = $"{ObtenerDescripcionComida(DespachoDetalle.ComidaId)} no pertenece al menú",
+                            Duration = 5_000
+                        };
+                    notificationService.Notify(mensaje);
+                }
+            }
         }
         else
         {
-            if (!VerificarCantidadComida)
+            if(DespachoDetalle.ComidaId <= 0)
             {
                 var mensaje = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
-                        Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula} raciones)",
+                        Detail = "Debes de seleccionar una comida",
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
             }
+            
 
-            if (!VerificarComida)
+            if(!validarEntradas())
             {
                 var mensaje = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
-                        Detail = $"{ObtenerDescripcionComida(DespachoDetalle.ComidaId)} no pertenece al menú",
+                        Detail = "Debes de seleccionar un Centro Educativo y un Menú",
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
             }
         }
+
         StateHasChanged();
     }
 
@@ -390,11 +412,17 @@
         foreach (var item in menu!.MenuDetalles)
         {
             var detalle = Despacho.DespachoDetalles.Any(md => md.ComidaId == item.ComidaId);
-           if (!detalle)
+            if (!detalle)
                 return false;
         }
         return true;
     }
+    public bool validarEntradas()
+    {
+        var validar = Despacho.CentroEducativoId > 0 && Despacho.MenuId > 0;      
+        return  validar;
+    }
+
     public bool Negacion(bool valor) => !valor;
    
 }

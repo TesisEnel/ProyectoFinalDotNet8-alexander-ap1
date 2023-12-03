@@ -231,7 +231,6 @@ namespace ProyectoFinalDotNet8.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("CodigoDistrital")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CodigoRegional")
