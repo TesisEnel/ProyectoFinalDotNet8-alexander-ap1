@@ -43,7 +43,7 @@
                 <div class="row">
                     <div class="col">
                         <label>C&oacutedigo Regional:</label>
-                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoRegional" @oninput="AsignarDistrito">
+                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoRegional" @onclick="AsignarDistrito">
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in ListRegiones)
                             {
@@ -54,11 +54,11 @@
                     </div>
                     <div class="col">
                         <label>C&oacutedigo Distrital:</label>
-                        <InputSelect class="form-select" @bind-Value="centroEducativo.CodigoDistrital" @onclick="AsignarRegion">
+                        <InputSelect class="form-select" @bind-Value="DistritoId" @onclick="AsignarRegion">
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in ListDistritos)
                             {
-                                <option value="@item.CodigoDistrito">@item.NombreDistrital</option>
+                                <option  value="@item.DistritoId">@item.NombreDistrital</option>
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => centroEducativo.CodigoDistrital)" />
@@ -69,7 +69,7 @@
                             <option value="" selected>Seleccione</option>
                             @foreach (var item in Directores)
                             {
-                                <option value="@item">@BuscarNombreDirecotor(item)</option>
+                                <option value="@item">@OptenerNombreUsuario(item)</option>
                             }
                         </InputSelect>
                         <ValidationMessage For="@(() => centroEducativo.DirectorId)" />
@@ -101,6 +101,8 @@
     public List<ApplicationUser> Usuarios { get; set; } = new();
     public List<string> Directores { get; set; } = new();
     public CentrosEducativos centroEducativo { get; set; } = new CentrosEducativos();
+    public List<CentrosEducativos> ListCentrosEducativos { get; set; } = new List<CentrosEducativos>();
+    public int DistritoId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,6 +110,7 @@
         ListDistritos = (await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos"))!;
         ListRegiones = (await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones"))!;
         Usuarios = (await httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/Usuers"))!;
+        ListCentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
 
         if (CentroEducativoId > 0)
         {
@@ -119,6 +122,7 @@
 
     void Nuevo()
     {
+        DistritoId = 0;
         centroEducativo = new CentrosEducativos();
 
         var mensaje = new NotificationMessage
@@ -141,6 +145,7 @@
         if (centroEducativoEncontrado != null)
         {
             centroEducativo = centroEducativoEncontrado;
+            DistritoId = ListDistritos.FirstOrDefault(d => d.CodigoDistrito == centroEducativo.CodigoDistrital)?.DistritoId ?? 0;
             StateHasChanged();
         }
         else
@@ -163,36 +168,53 @@
 
     public async Task Guardar()
     {
-        using var response = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);
-
-        if (!response.IsSuccessStatusCode)
+        centroEducativo.CodigoDistrital = BuscarCodigoDistrital(DistritoId);
+        if (ValidarDirectorYaAsignado())
         {
             var mensaje = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
                     Summary = "Error",
-                    Detail = "Centro educativo no guardado",
+                    Detail = "El director ya está asignado a otro centro educativo",
                     Duration = 5000
                 };
             notificationService.Notify(mensaje);
             return;
         }
-
-        var centroEducativoDevuelto = await response.Content.ReadFromJsonAsync<CentrosEducativos>();
-        if (centroEducativoDevuelto != null)
+        else
         {
-            centroEducativo = centroEducativoDevuelto;
-            StateHasChanged();
-            Nuevo();
-            var mensaje = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Guardado",
-                    Detail = "Centro educativo guardado",
-                    Duration = 5000
-                };
-            notificationService.Notify(mensaje);
+            using var response = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "Centro educativo no guardado",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+                return;
+            }
+
+            var centroEducativoDevuelto = await response.Content.ReadFromJsonAsync<CentrosEducativos>();
+            if (centroEducativoDevuelto != null)
+            {
+                centroEducativo = centroEducativoDevuelto;
+                StateHasChanged();
+                Nuevo();
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado",
+                        Detail = "Centro educativo guardado",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+            }
         }
+       
     }
 
     public async Task Eliminar()
@@ -236,15 +258,36 @@
             notificationService.Notify(mensaje);
         }
     }
+
+   
     public void AsignarRegion()
     {
-        if (!string.IsNullOrEmpty(centroEducativo.CodigoDistrital))
+        var distrito = ListDistritos.Where(d => d.DistritoId == DistritoId).FirstOrDefault();
+        if (distrito != null)
         {
-            centroEducativo.CodigoRegional = ListDistritos
-            .FirstOrDefault(d => d.CodigoDistrito == centroEducativo.CodigoDistrital)?.CodigoRegional;
+            centroEducativo.CodigoRegional = distrito!.CodigoRegional;
             StateHasChanged();
         }
     }
+
+    public bool ValidarDirectorYaAsignado()
+    {
+        var existe = ListCentrosEducativos.Any(c => c.DirectorId == centroEducativo.DirectorId);
+
+        return existe;
+    }
+
+    public string OptenerNombreUsuario(string UserId)
+    {
+        return Usuarios.FirstOrDefault(u => u.Id == UserId)?.Nombre 
+        + " " + Usuarios.FirstOrDefault(u => u.Id == UserId)?.Apellidos;
+    }
+
+    public string BuscarCodigoDistrital(int DistritoId)
+    {
+        return ListDistritos.FirstOrDefault(d => d.DistritoId == DistritoId)?.CodigoDistrito ?? "No encontrado";
+    }
+
     public async Task AsignarDistrito()
     {
         var listDistritoTemporal = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos");

@@ -4,7 +4,7 @@
 @using ProyectoFinalDotNet8.Data
 @using Shared.Models
 @inject HttpClient httpClient
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Director")]
 @inject AuthenticationStateProvider authenticationStateProvider
 
 
@@ -200,7 +200,6 @@
             Console.WriteLine(ex.Message);
         }
 
-
         Conteo = Despachos != null ? Despachos.Count : 0;
     }
 
@@ -259,7 +258,7 @@
         var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id && c.CentroEducativoId == Id);
         return centro != null;
     }
-    
+
 
 
     // public bool UsuarioCentroEducativo()
@@ -268,21 +267,30 @@
     //     var centro = CentrosEducativos.FirstOrDefault(c => c.DirectorId == usuario?.Id);
     //     return centro != null;
     // }
+    public string BuscarNombredDelUsuario()
+    {
+        var usuario = Usuarios.FirstOrDefault(u => u.Email == AuthState?.User?.Identity?.Name);
+        return usuario?.Nombre! + " " + usuario?.Apellidos!;
 
-
-
+    }
 
     public async Task ConfirmarDespacho(int Id)
     {
         var despacho = Despachos.FirstOrDefault(d => d.DespachoId == Id);
 
         if(despacho!.ConfirmacionEntrega == false)
+        {
+            despacho.RecibidoPor = BuscarNombredDelUsuario();
+            despacho.FechaRecepcion = DateTime.Now;
             despacho!.ConfirmacionEntrega = true;
-
+        }
         else
+        {
             despacho!.ConfirmacionEntrega = false;
+            despacho.RecibidoPor = string.Empty;
+            despacho.FechaRecepcion = DateTime.MinValue;
+        }
 
-        despacho.FechaRecepcion = DateTime.Now;
         var response = await httpClient.PutAsJsonAsync($"api/Despachos/{Id}", despacho);
         Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
         StateHasChanged();

@@ -1,7 +1,7 @@
 ﻿@page "/ConsultaComida"
 @inject HttpClient httpClient
 @rendermode InteractiveAuto
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin,Empleado")]
 
 <div>
     <div class="row justify-content-start ">
@@ -14,14 +14,13 @@
                             <label>filtrar por</label>
                             <div class="col">
                                 <InputSelect class="form-select" @bind-Value="opciones">
-                                    <option value="0" selected>ID</option>
+                                    <option value="0" selected>Buscar Todo</option>
                                     <option value="1">Descripci&oacute;n</option>
-                                    <option value="2">Id Tipo Comida</option>
-                                    <option value="3">Tipo Comida</option>
+                                    <option value="2">Tipo Comida</option>
                                 </InputSelect>
                             </div>
                             <div class="col input-group">
-                                <button class="form-control oi oi-magnifying-glass" type="button" @onclick="Buscar"></button>
+                                <button class="form-control bi bi-search btn-primary" type="button" @onclick="Buscar"></button>
                             </div>
                         </div>
                         <div class="row">
@@ -29,16 +28,17 @@
 
                                 @switch (opciones)
                                 {
-                                    case 0:
-                                        <InputNumber class="form-control" @bind-Value="ComidaAuxiliar.ComidaId" min="0"></InputNumber>
-                                        break;
                                     case 1:
-                                        <InputText class="form-control" @bind-Value="ComidaAuxiliar.Descripcion"></InputText>
+                                        @* <InputText class="form-control" @bind-Value="ComidaAuxiliar.Descripcion"></InputText> *@
+                                        <input @bind="ComidaAuxiliar.Descripcion" list="ComidasAux" class="form-control" />
+                                        <datalist id="ComidasAux">
+                                            @foreach (var item in ComidasAux)
+                                            {
+                                                <option value="@item.Descripcion"></option>
+                                            }
+                                        </datalist>
                                         break;
                                     case 2:
-                                        <InputNumber class="form-control" @bind-Value="ComidaAuxiliar.TipoComidaId" min="0"></InputNumber>
-                                        break;
-                                    case 3:
                                         <InputSelect @bind-Value="ComidaAuxiliar.TipoComidaId" class="form-select">
                                             <option value="0"> Seleccione</option>
                                             @foreach (var item in Tipos)
@@ -57,9 +57,8 @@
                         <table border="1" class="table table-bordered table-striped ">
                             <thead>
                                 <tr class="table-secondary">
-                                    <th>Id Comida</th>
                                     <th>Descripci&oacute;n</th>
-                                    <th>Id Tipo de comida</th>
+                                    <th>Tipo de comida</th>
                                     <th>Ver</th>
                                 </tr>
                             </thead>
@@ -67,9 +66,8 @@
                                 @foreach (var tabla in Comidas)
                                 {
                                     <tr>
-                                        <td>@tabla.ComidaId</td>
                                         <td>@tabla.Descripcion</td>
-                                        <td>@tabla.TipoComidaId</td>
+                                        <td>@ObtenerDescripcionTipoComida(tabla.TipoComidaId)</td>
                                         <td><a href="RegistroComida/@tabla.ComidaId">ver</a></td>
                                     </tr>
                                 }
@@ -101,9 +99,11 @@
     public DateTime Hasta { get; set; }
     public Comidas ComidaAuxiliar = new();
     public List<TiposComidas> Tipos { get; set; } = new();
+    public List<Comidas> ComidasAux { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
         Tipos = await httpClient.GetFromJsonAsync<List<TiposComidas>>("api/TiposComidas")?? new List<TiposComidas>()?? new List<TiposComidas>();
+        ComidasAux = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas")?? new List<Comidas>();
         Desde = DateTime.Now.AddMonths(-1);
         Hasta = DateTime.Now;
          await Buscar();
@@ -115,16 +115,9 @@
         switch (opciones)
         {
             case 0:
-                if (ComidaAuxiliar.ComidaId == 0)
-                {
                     Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!;
                     StateHasChanged();
-                }
-                else
-                {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(c => c.ComidaId == ComidaAuxiliar.ComidaId).ToList();
-                    StateHasChanged();
-                }
+       
                 break;
 
             case 1:
@@ -135,8 +128,11 @@
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(t => t.Descripcion!
-                        .Contains(ComidaAuxiliar.Descripcion, StringComparison.OrdinalIgnoreCase)).ToList();
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!
+                    .Where(t => t.Descripcion!
+                        .Contains(ComidaAuxiliar.Descripcion, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+
                     StateHasChanged();
                 }
                 break;
@@ -149,19 +145,10 @@
                 }
                 else
                 {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
-                    StateHasChanged();
-                }
-                break;
-            case 3:
-                if (ComidaAuxiliar.TipoComidaId == 0)
-                {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!;
-                    StateHasChanged();
-                }
-                else
-                {
-                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!.Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId).ToList();
+                    Comidas = (await httpClient.GetFromJsonAsync<List<Comidas>>($"api/Comidas"))!
+                    .Where(c => c.TipoComidaId == ComidaAuxiliar.TipoComidaId)
+                        .ToList();
+                    
                     StateHasChanged();
                 }
                 break;
@@ -173,4 +160,5 @@
         var tipoComida = Tipos.FirstOrDefault(t => t.TipoComidaId == id);
         return tipoComida?.Tipo;
     }
+   
 }

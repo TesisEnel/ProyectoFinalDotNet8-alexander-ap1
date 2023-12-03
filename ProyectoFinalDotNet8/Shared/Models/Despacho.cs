@@ -13,11 +13,13 @@ namespace Shared.Models
         [Key]
         public int DespachoId { get; set; }
         public DateTime Fecha { get; set; } = DateTime.Now;
+        [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un centro educativo")]
         public int CentroEducativoId { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un menú")]
         public int MenuId { get; set; }
         public bool ConfirmacionEntrega { get; set; }
         public string? RecibidoPor { get; set; }
-        public DateTime FechaRecepcion { get; set; } = DateTime.Now;
+        public DateTime FechaRecepcion { get; set; }
         [ForeignKey("DespachoId")]
         public ICollection<DespachoDetalle> DespachoDetalles { get; set; } = new List<DespachoDetalle>();
     }

@@ -14,7 +14,7 @@ namespace Shared.Models
         public int MenuId { get; set; }
         [Required(ErrorMessage = "El campo descripción es obligatorio")]
         public string? Descripcion { get; set; }
-        [Required(ErrorMessage = "El campo descripción es obligatorio")]
+        [Required(ErrorMessage = "El campo día de la semana es obligatorio")]
         public string? DiaSemana { get; set; }
         public byte[]? Imagen { get; set; }  
 
