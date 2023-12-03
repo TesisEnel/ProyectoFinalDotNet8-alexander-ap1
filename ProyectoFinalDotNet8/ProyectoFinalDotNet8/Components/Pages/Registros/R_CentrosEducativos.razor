@@ -101,6 +101,7 @@
     public List<ApplicationUser> Usuarios { get; set; } = new();
     public List<string> Directores { get; set; } = new();
     public CentrosEducativos centroEducativo { get; set; } = new CentrosEducativos();
+    public List<CentrosEducativos> ListCentrosEducativos { get; set; } = new List<CentrosEducativos>();
     public int DistritoId { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -109,6 +110,7 @@
         ListDistritos = (await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos"))!;
         ListRegiones = (await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones"))!;
         Usuarios = (await httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/Usuers"))!;
+        ListCentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
 
         if (CentroEducativoId > 0)
         {
@@ -167,36 +169,52 @@
     public async Task Guardar()
     {
         centroEducativo.CodigoDistrital = BuscarCodigoDistrital(DistritoId);
-        using var response = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);
-
-        if (!response.IsSuccessStatusCode)
+        if (ValidarDirectorYaAsignado())
         {
             var mensaje = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
                     Summary = "Error",
-                    Detail = "Centro educativo no guardado",
+                    Detail = "El director ya está asignado a otro centro educativo",
                     Duration = 5000
                 };
             notificationService.Notify(mensaje);
             return;
         }
-
-        var centroEducativoDevuelto = await response.Content.ReadFromJsonAsync<CentrosEducativos>();
-        if (centroEducativoDevuelto != null)
+        else
         {
-            centroEducativo = centroEducativoDevuelto;
-            StateHasChanged();
-            Nuevo();
-            var mensaje = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Guardado",
-                    Detail = "Centro educativo guardado",
-                    Duration = 5000
-                };
-            notificationService.Notify(mensaje);
+            using var response = await httpClient.PostAsJsonAsync($"api/CentrosEducativos", centroEducativo);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "Centro educativo no guardado",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+                return;
+            }
+
+            var centroEducativoDevuelto = await response.Content.ReadFromJsonAsync<CentrosEducativos>();
+            if (centroEducativoDevuelto != null)
+            {
+                centroEducativo = centroEducativoDevuelto;
+                StateHasChanged();
+                Nuevo();
+                var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado",
+                        Detail = "Centro educativo guardado",
+                        Duration = 5000
+                    };
+                notificationService.Notify(mensaje);
+            }
         }
+       
     }
 
     public async Task Eliminar()
@@ -250,6 +268,13 @@
             centroEducativo.CodigoRegional = distrito!.CodigoRegional;
             StateHasChanged();
         }
+    }
+
+    public bool ValidarDirectorYaAsignado()
+    {
+        var existe = ListCentrosEducativos.Any(c => c.DirectorId == centroEducativo.DirectorId);
+
+        return existe;
     }
 
     public string OptenerNombreUsuario(string UserId)

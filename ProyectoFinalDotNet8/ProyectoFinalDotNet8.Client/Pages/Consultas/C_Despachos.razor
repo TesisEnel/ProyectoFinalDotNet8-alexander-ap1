@@ -8,30 +8,36 @@
     <div class="row justify-content-start ">
         <div class="col-sm-10 col-md-9 col-lg-10 col-xl-xxl-7">
             <div class="card">
-                <div class="card-header">
+                <div class="card-body">
                     <h1>Consulta Despacho</h1>
+                    <div class="row">
+                        <div class="col">
+                            <label>Desde</label>
+                            <InputDate @bind-Value="Desde" class="form-control" max="@DateTime.Today.ToString("yyyy-MM-dd")"></InputDate>                            
+                        </div>
+                        <div class="col">
+                            <label>Hasta</label>
+                            <InputDate @bind-Value="Hasta" class="form-control" max="@DateTime.Today.ToString("yyyy-MM-dd")" ></InputDate>                           
+                        </div>
+                    </div>
                     <div class="row">
                         <label>Filtrar por</label>
                         <div class="col">
                             <InputSelect class="form-select" @bind-Value="opciones">
-                                <option value="0" selected>Buscar todo</option>
-                                <option value="1">Fecha</option>
+                                <option value="0" selected>Buscar todo</option>                            
                                 <option value="2">Men&uacute;</option>
                                 <option value="3">Centro Educativo</option>
                             </InputSelect>
                         </div>
                         <div class="col input-group">
-                            <button class="form-control bi bi-search" type="button" @onclick="Buscar"></button>
+                            <button class="form-control bi bi-search btn-primary" type="button" @onclick="Buscar"></button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
                             @switch (opciones)
-                            {
-                                
-                                case 1:
-                                    <InputDate class="form-control" @bind-Value="DespachoAuxiliar.Fecha"></InputDate>
-                                    break;
+                            {                               
+                             
                                 case 2:
                                     <InputSelect class="form-select" @bind-Value="DespachoAuxiliar.MenuId">
                                         @foreach (var item in Menus)
@@ -165,15 +171,20 @@
     public List<Despacho> Despachos { get; set; } = new List<Despacho>();
     public int Conteo;
     public int opciones;
+    public DateTime Desde { get; set; }
+    public DateTime Hasta { get; set; }
     public Despacho DespachoAuxiliar = new Despacho();
     public List<CentrosEducativos> CentrosEducativos { get; set; } = new List<CentrosEducativos>();
     public List<Menu> Menus { get; set; } = new List<Menu>();
     public List<Comidas> Comidas { get; set; } = new List<Comidas>();
     protected override async Task OnInitializedAsync()
     {
+        Desde = DateTime.Now.AddMonths(-3);
+        Hasta = DateTime.Now;
         Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas") ?? new List<Comidas>();
         Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
         CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos")?? new List<CentrosEducativos>();
+        await Buscar();
 
     }
 
@@ -184,42 +195,33 @@
             switch (opciones)
             {
                 case 0:                  
-                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;                   
-                    break;
-
-                case 1:
-                    if (DespachoAuxiliar.Fecha == DateTime.MinValue)
-                    {
-                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
-                    }
-                    else
-                    {
-                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
-                            .Where(d => d.Fecha.Date == DespachoAuxiliar.Fecha.Date).ToList();
-                    }
+                    Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.Fecha.Date >= Desde.Date && d.Fecha.Date <= Hasta.Date).ToList();
                     break;
 
                 case 2:
                     if (DespachoAuxiliar.MenuId == 0)
                     {
-                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.Fecha.Date >= Desde.Date && d.Fecha.Date <= Hasta.Date).ToList();
                     }
                     else
                     {
                         Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
-                            .Where(d => d.MenuId == DespachoAuxiliar.MenuId).ToList();
+                            .Where(d => d.MenuId == DespachoAuxiliar.MenuId && (d.Fecha.Date >= Desde.Date && d.Fecha.Date <= Hasta.Date)).ToList();
                     }
                     break;
 
                 case 3:
                     if (DespachoAuxiliar.CentroEducativoId == 0)
                     {
-                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+                        Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
+                            .Where(d => d.Fecha.Date >= Desde.Date && d.Fecha.Date <= Hasta.Date).ToList();             
                     }
                     else
                     {
                         Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!
-                            .Where(d => d.CentroEducativoId == DespachoAuxiliar.CentroEducativoId).ToList();
+                            .Where(d => d.CentroEducativoId == DespachoAuxiliar.CentroEducativoId && (d.Fecha.Date >= Desde.Date && d.Fecha.Date <= Hasta.Date)).ToList();
                     }
                     break;
             }

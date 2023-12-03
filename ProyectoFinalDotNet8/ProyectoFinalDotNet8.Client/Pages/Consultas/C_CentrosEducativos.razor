@@ -5,7 +5,7 @@
 
 <div>
     <div class="row justify-content-start ">
-        <div class=" col-sm-10 col-md-9 col-lg-10 col-xl-xxl-7 ">
+        <div class=" col-sm-10 col-md-9 col-lg-12 col-xl-xxl-7 ">
             <div class="card">
                 <div class="card-header">
                     <h1>Consulta Centro Educativo</h1>
@@ -14,7 +14,7 @@
                             <label>filtrar por</label>
                             <div class="col">
                                 <InputSelect class="form-select" @bind-Value="opciones">
-                                    <option value="0" selected>ID</option>
+                                    <option value="0" selected>Buscar Todos</option>
                                     <option value="1">Nombre</option>
                                     <option value="2">Cantidad de Matrícula</option>
                                     <option value="3">Código Distrital</option>
@@ -23,16 +23,14 @@
                                 </InputSelect>
                             </div>
                             <div class="col input-group">
-                                <button class="form-control oi oi-magnifying-glass" type="button" @onclick="Buscar"></button>
+                                <button class="form-control bi bi-search btn btn-primary" type="button" @onclick="Buscar"></button>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
                                 @switch (opciones)
                                 {
-                                    case 0:
-                                        <InputNumber class="form-control" @bind-Value="CentroEducativoAuxiliar.CentroEducativoId"></InputNumber>
-                                        break;
+                                
                                     case 1:
                                         <InputText class="form-control" @bind-Value="CentroEducativoAuxiliar.Nombre"></InputText>
                                         break;
@@ -40,11 +38,11 @@
                                         <InputNumber class="form-control" @bind-Value="CentroEducativoAuxiliar.CantidadMatricula"></InputNumber>
                                         break;
                                     case 3:
-                                        <InputSelect class="form-select" @bind-Value="CentroEducativoAuxiliar.CodigoDistrital">
-                                            <option value="" selected>Seleccione</option>
+                                        <InputSelect class="form-select" @bind-Value="DistritoId">
+                                            <option value="0" selected>Seleccione</option>
                                             @foreach (var item in ListDistritos)
                                             {
-                                                <option value="@item.CodigoDistrito">@item.NombreDistrital</option>
+                                                <option value="@item.DistritoId">@item.NombreDistrital</option>
                                             }
                                         </InputSelect>
                                         break;
@@ -70,10 +68,11 @@
                         <table border="1" class="table table-bordered table-striped ">
                             <thead>
                                 <tr class="table-secondary">
-                                    <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Cantidad de Matr&iacutecula</th>
+                                    <th>Distrito</th>
                                     <th>C&oacutedigo Distrital</th>
+                                    <th>Regi&oacuten</th>
                                     <th>C&oacutedigo Regional</th>
                                     <th>Direcci&oacute;n</th>                                  
                                     <th>Ver</th>
@@ -83,10 +82,11 @@
                                 @foreach (var centroEducativo in CentrosEducativos)
                                 {
                                     <tr>
-                                        <td>@centroEducativo.CentroEducativoId</td>
                                         <td>@centroEducativo.Nombre</td>
                                         <td>@centroEducativo.CantidadMatricula</td>
+                                        <td>@NombreDistrito(centroEducativo.CodigoDistrital!)</td>
                                         <td>@centroEducativo.CodigoDistrital</td>
+                                        <td>@NombreRegion(centroEducativo.CodigoRegional!)</td>
                                         <td>@centroEducativo.CodigoRegional</td>
                                         <td>@centroEducativo.Direccion</td>
                                         <td><a href="RegistroCentroEducativo/@centroEducativo.CentroEducativoId">ver</a></td>
@@ -114,11 +114,13 @@
     public CentrosEducativos CentroEducativoAuxiliar = new CentrosEducativos();
     public List<Distritos> ListDistritos { get; set; } = new();
     public List<Regiones> ListRegiones { get; set; } = new();
+    public int DistritoId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         ListDistritos = await httpClient.GetFromJsonAsync<List<Distritos>>("api/distritos")?? new List<Distritos>();
         ListRegiones = await httpClient.GetFromJsonAsync<List<Regiones>>("api/Regiones")?? new List<Regiones>();
+        await Buscar();
     }
 
     public async Task Buscar()
@@ -126,15 +128,7 @@
         switch (opciones)
         {
             case 0:
-                if (CentroEducativoAuxiliar.CentroEducativoId == 0)
-                {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
-                }
-                else
-                {
-                    CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
-                        .Where(c => c.CentroEducativoId == CentroEducativoAuxiliar.CentroEducativoId).ToList();
-                }
+                   CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;                
                 break;
 
             case 1:
@@ -162,14 +156,15 @@
                 break;
 
             case 3: 
-                if (string.IsNullOrEmpty(CentroEducativoAuxiliar.CodigoDistrital))
+                if (DistritoId <= 0)
                 {
                     CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!;
                 }
                 else
                 {
+                    var distrito = ObtenerDistrito(DistritoId);
                     CentrosEducativos = (await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos"))!
-                        .Where(c => c.CodigoDistrital == CentroEducativoAuxiliar.CodigoDistrital).ToList();
+                        .Where(c => c.CodigoRegional == distrito.CodigoRegional && c.CodigoDistrital == distrito.CodigoDistrito).ToList();
                 }
                 break;
 
@@ -199,5 +194,19 @@
         }
 
         Conteo = CentrosEducativos != null ?  CentrosEducativos.Count : 0;
+    }
+    public string NombreRegion(string CodigoRegional)
+    {
+        return ListRegiones.FirstOrDefault(r => r.CodigoRegional == CodigoRegional)?.NombreRegion ?? "No encontrado";
+    }
+
+    public string NombreDistrito(string CodigoDistrital)
+    {
+        return ListDistritos.FirstOrDefault(d => d.CodigoDistrito == CodigoDistrital)?.NombreDistrital ?? "No encontrado";
+    }
+
+    public Distritos ObtenerDistrito(int DistritoId)
+    {
+        return ListDistritos.FirstOrDefault(d => d.DistritoId == DistritoId)!;
     }
 }
