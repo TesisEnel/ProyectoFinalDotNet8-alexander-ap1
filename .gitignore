@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ProyectoFinalDotNet8/ProyectoFinalDotNet8/Data/ProyectoFinalDotNet8.Db-shm
