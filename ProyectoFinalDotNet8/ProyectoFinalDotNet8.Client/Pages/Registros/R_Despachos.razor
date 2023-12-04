@@ -298,12 +298,13 @@
     public void AgregarDetalle()
     {
         // if (DespachoDetalle.CantidadDecomida > 0)
-        if (DespachoDetalle.ComidaId > 0 && validarEntradas())
+        if (DespachoDetalle.ComidaId > 0 && validarEntradas()  )
         {
             var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula <= DespachoDetalle.CantidadDecomida;
             var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
+
             var VerificarComida = menuEncotrado!.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
-            if (VerificarCantidadComida && VerificarComida)
+            if (VerificarCantidadComida && VerificarComida && ValidarCantidadComidaExcesiva())
             {
                 DespachoDetalle.DespachoId = Despacho.DespachoId;
                 Despacho.DespachoDetalles.Add(DespachoDetalle);
@@ -351,7 +352,7 @@
                     };
                 notificationService.Notify(mensaje);
             }
-            
+
 
             if(!validarEntradas())
             {
@@ -424,5 +425,23 @@
     }
 
     public bool Negacion(bool valor) => !valor;
+
+    public bool ValidarCantidadComidaExcesiva()
+    {
+        var cantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula;
+        var cantidadExcesiva = DespachoDetalle.CantidadDecomida >= (cantidadComida * 2);
+        if(cantidadExcesiva)
+        {
+            var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error ",
+                        Detail = $"Estás introduciendo más del doble de raciones de la cantidad requerida, revisa la cantidad que estás ingresando",
+                        Duration = 5_000
+                    };
+                notificationService.Notify(mensaje);
+        }
+        return Negacion(cantidadExcesiva);
+    }
    
 }

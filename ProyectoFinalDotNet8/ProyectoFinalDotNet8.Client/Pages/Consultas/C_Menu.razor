@@ -31,22 +31,22 @@
                             {
                                 case 1:
                                     @* <InputText class="form-control" @bind-Value="MenuAuxiliar.Descripcion"></InputText> *@
-                                    <input @bind ="MenuAuxiliar.Descripcion" list="ListaDescripciones" class="form-control" />
-                                    <datalist id="ListaDescripciones" >
+                                    <input @bind="MenuAuxiliar.Descripcion" list="ListaDescripciones" class="form-control" />
+                                    <datalist id="ListaDescripciones">
                                         @foreach (var item in ListaDescripciones)
                                         {
-                                            <option value="@item"></option> 
+                                            <option value="@item"></option>
                                         }
                                     </datalist>
-@* 
-                                    <input list="options" />
+                                    @*
+                            <input list="options" />
 
-                                    <datalist id="options">
-                                        @foreach (var option in options)
-                                        {
-                                            <option value="@option"></option>
-                                        }
-                                    </datalist> *@
+                            <datalist id="options">
+                            @foreach (var option in options)
+                            {
+                            <option value="@option"></option>
+                            }
+                            </datalist> *@
                                     break;
                                 case 2:
                                     <InputSelect class="form-control" @bind-Value="MenuAuxiliar.DiaSemana">
@@ -64,34 +64,34 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                    <div class="col">
-                       <h3>Listados de men&uacute;</h3>
-                     
-                    </div>
-                    
-                     @foreach (var menu in Menus)
-                     {
+                        <div class="col">
+                            <h3>Listados de men&uacute;</h3>
+
+                        </div>
+
+                        @foreach (var menu in Menus)
+                        {
                             <div class="card">
-                        <div class="container mt-5">
-                            <div class="row">
-                                <div class="col-md-6">
-                                        @if (menu.Imagen != null)
-                                        {
-                                            var base64 = Convert.ToBase64String(menu.Imagen);
-                                            var imgSrc = $"data:image/jpeg;base64,{base64}";
-                                            <img src="@imgSrc" alt="Imagen del producto" class="rounded mx-auto d-block img-fluid" style="max-width: 300px; max-height: 300px; margin: 5px;" />
-                                        }
-                                </div>
-                                <div class="col-md-6">
-                                    <h2>@menu.Descripcion</h2>
-                                    <strong>Descripc&iacute;on:</strong>
-                                    @foreach(var comida in menu.MenuDetalles)
-                                    {
-                                        <p class="text-muted">@ObtenerDescripcionComida(comida.ComidaId)</p>
-                                    }       
-                                        <p><strong>D&iacute;a de la semana:</strong> @menu.DiaSemana</p>                                       
-                                        <strong> Nota promedio: </strong>
-                                            @if(menu.ComenentarioDetalle.Count > 0)
+                                <div class="container mt-5">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            @if (menu.Imagen != null)
+                                            {
+                                                var base64 = Convert.ToBase64String(menu.Imagen);
+                                                var imgSrc = $"data:image/jpeg;base64,{base64}";
+                                                <img src="@imgSrc" alt="Imagen del producto" class="rounded mx-auto d-block img-fluid" style="max-width: 300px; max-height: 300px; margin: 5px;" />
+                                            }
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h2>@menu.Descripcion</h2>
+                                            <strong>Descripc&iacute;on:</strong>
+                                            @foreach (var comida in menu.MenuDetalles)
+                                            {
+                                                <p class="text-muted">@ObtenerDescripcionComida(comida.ComidaId)</p>
+                                            }
+                                            <p><strong>D&iacute;a de la semana:</strong> @menu.DiaSemana</p>
+                                            <strong> Nota promedio: </strong>
+                                            @if (menu.ComenentarioDetalle.Count > 0)
                                             {
                                                 @for (int i = 0; i < 5; i++)
                                                 {
@@ -107,32 +107,35 @@
 
                                                 }
                                             }
-                                           
-                                        @* @if (menu.ComenentarioDetalle.Count > 0)
+
+                                            @* @if (menu.ComenentarioDetalle.Count > 0)
                                         @for (int i = 0; i < 4 - (menu.ComenentarioDetalle.Average(c => c.Nota)); i++)
                                         {
-                                                <i class="bi bi-star text-warning"></i>
+                                        <i class="bi bi-star text-warning"></i>
                                         } *@
-                                        <br />
-                                        @* <button class="btn btn-primary" href="RegistroComida/@tabla.ComidaId">Editar</button> *@
+                                            <br />
+                                            @* <button class="btn btn-primary" href="RegistroComida/@tabla.ComidaId">Editar</button> *@
                                             <a href="Comentarios/@menu.MenuId" class="btn btn-success btn-lg active" data-mdb-ripple-init role="button" aria-pressed="true">Comentar</a>
-                                            <a href="RegistroMenu/@menu.MenuId"class="btn btn-primary btn-lg active" data-mdb-ripple-init role="button" aria-pressed="true">Editar</a>
+                                            <AuthorizeView Roles="Admin">
+                                                <Authorized>
+                                                    <a href="RegistroMenu/@menu.MenuId" class="btn btn-primary btn-lg active" data-mdb-ripple-init role="button" aria-pressed="true">Editar</a>
+                                                </Authorized>
+                                            </AuthorizeView>
                                             @* <button type="button" @onclick="(() => IrRegistroMenu(menu.MenuId))"  class="btn btn-primary">Editar</button>
-                                            <button type="button" @onclick="(() => IrComentarios(menu.MenuId))" class="btn btn-success">Comentar</button> *@
-                                        @* <a href="/RegistroMenu/@menu.MenuId"><button type="button" class="btn btn-primary"><i class="oi oi-plus"> Editar</i></button></a>
+                                        <button type="button" @onclick="(() => IrComentarios(menu.MenuId))" class="btn btn-success">Comentar</button> *@
+                                            @* <a href="/RegistroMenu/@menu.MenuId"><button type="button" class="btn btn-primary"><i class="oi oi-plus"> Editar</i></button></a>
                                         <a href="/Comentarios/@menu.MenuId"><button type="button" class="btn btn-warning"><i class="oi oi-plus"> Comentar</i></button></a> *@
 
-                                          
 
-                                </div> 
-                            </div>
-                            <div class="row mt-5">
-                                
-                            </div>
-                        </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                    </div>
+                                </div>
                             </div>
 
-                    }
+                        }
                     </div>
                 </div>
             </div>
@@ -150,12 +153,23 @@
     public List<string> ListaDescripciones { get; set; } = new List<string>();
     protected override async Task OnInitializedAsync()
     {
-        var comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas") ?? new List<Comidas>();
-        Comidas = comidas;
-        var comentarios = await httpClient.GetFromJsonAsync<List<Comentarios>>("api/menus/Comentarios") ?? new List<Comentarios>();
-        Comentarios = comentarios;
-        Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
-        ListaDescripciones = await ObtenerDescriopnesMenu();
+        await base.OnInitializedAsync();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            var comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas") ?? new List<Comidas>();
+            Comidas = comidas;
+            var comentarios = await httpClient.GetFromJsonAsync<List<Comentarios>>("api/menus/Comentarios") ?? new List<Comentarios>();
+            Comentarios = comentarios;
+            Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
+            ListaDescripciones = ObtenerDescriopnesMenu();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     public async Task Buscar()
@@ -163,7 +177,7 @@
         switch (opciones)
         {
             case 0:
-                Menus = (await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>());                
+                Menus = (await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>());
                 break;
 
             case 1:
@@ -207,14 +221,13 @@
         NavigationManager.NavigateTo($"/RegistroMenu/{menuId}");
     }
 
-    public async Task<List<string>> ObtenerDescriopnesMenu()
+    public List<string> ObtenerDescriopnesMenu()
     {
         List<string> descripciones = new List<string>();
-        await Task.Run(() =>
-        {
-           foreach(var menu in Menus){
-               descripciones.Add(menu.Descripcion!);
-       }});
+
+        foreach (var menu in Menus)
+            descripciones.Add(menu.Descripcion!);
+
         return descripciones;
     }
 
