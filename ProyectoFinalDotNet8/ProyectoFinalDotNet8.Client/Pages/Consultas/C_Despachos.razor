@@ -147,6 +147,7 @@
                                                 <p><strong>Hora de despacho: </strong> @despacho.Fecha.ToString("hh:mmtt")</p>
                                                 <p><strong>Fecha de recepci&oacute;n: </strong>@despacho.FechaRecepcion.ToString("dd/MMM/yyyy")</p>
                                                 <p><strong>Hora de recepci&oacute;n: </strong>@despacho.FechaRecepcion.ToString("hh:mmtt")</p>
+                                                <p><strong>Recibido por:</strong> @despacho.RecibidoPor</p>
                                             </div>
                                         </div>
                                         <div class="row mt-5">
@@ -159,9 +160,6 @@
                         }
                     </div>
                 </div>
-
-
-
             </div>
         </div>
     </div>
@@ -177,15 +175,26 @@
     public List<CentrosEducativos> CentrosEducativos { get; set; } = new List<CentrosEducativos>();
     public List<Menu> Menus { get; set; } = new List<Menu>();
     public List<Comidas> Comidas { get; set; } = new List<Comidas>();
+
     protected override async Task OnInitializedAsync()
     {
-        Desde = DateTime.Now.AddMonths(-3);
-        Hasta = DateTime.Now;
-        Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas") ?? new List<Comidas>();
-        Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
-        CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos")?? new List<CentrosEducativos>();
-        await Buscar();
+        await base.OnInitializedAsync();
+    }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+
+            Desde = DateTime.Now.AddMonths(-3);
+            Hasta = DateTime.Now;
+            Comidas = await httpClient.GetFromJsonAsync<List<Comidas>>("api/Comidas") ?? new List<Comidas>();
+            Menus = await httpClient.GetFromJsonAsync<List<Menu>>("api/Menus") ?? new List<Menu>();
+            CentrosEducativos = await httpClient.GetFromJsonAsync<List<CentrosEducativos>>("api/CentrosEducativos") ?? new List<CentrosEducativos>();
+            Despachos = (await httpClient.GetFromJsonAsync<List<Despacho>>("api/Despachos"))!;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     public async Task Buscar()

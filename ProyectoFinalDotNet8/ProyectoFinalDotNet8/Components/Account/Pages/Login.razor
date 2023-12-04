@@ -57,9 +57,6 @@
     </div>
     <div class="col-md-6 col-md-offset-2">
         <section>
-            <h3>Utilice otro servicio para iniciar sesión.</h3>
-            <hr />
-            <ExternalLoginPicker />
         </section>
     </div>
 </div>
@@ -81,7 +78,10 @@
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
             // Clear the existing external cookie to ensure a clean login process
+
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            //que al cerrar sesion vaya al home
+
         }
     }
 
@@ -93,8 +93,8 @@
         if (result.Succeeded)
         {
             Logger.LogInformation("El usuario ha iniciado sesión.");
-            // NavigationManager.NavigateTo($"/Home");
-            RedirectManager.RedirectTo(ReturnUrl);
+            NavigationManager.NavigateTo($"/");
+            // RedirectManager.RedirectTo(ReturnUrl);
         }
         else if (result.RequiresTwoFactor)
         {

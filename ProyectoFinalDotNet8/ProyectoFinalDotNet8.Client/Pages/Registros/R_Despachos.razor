@@ -16,21 +16,16 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <label>Despacho ID:</label>
-                        <div class=" col-auto  mb-3">
-                            <InputNumber @bind-Value="Despacho.DespachoId" class="form-control" min="0"></InputNumber>
-                            <ValidationMessage For="@(() => Despacho.MenuId)" />
-                        </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"></button>
-                        </div>
-                    </div>
-                    <div class="row">
+
                         <div class="col">
                             <label>Fecha: </label>
                             <InputDate @bind-Value="Despacho.Fecha" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")"
                                        max="@DateTime.Today.ToString("yyyy-MM-dd")"></InputDate>
-                            <ValidationMessage For="@(() => Despacho.Fecha)" />
+                            <ValidationMessage For="@(() => Despacho.Fecha)" />                          
+                        </div>
+                        <div class="col">
+                            <label>Hora: </label>
+                            <input type="time" id="PurchaseTime" name="PurchaseTime" @bind="Despacho.Fecha" class="form-control" />
                         </div>
                     </div>
                     <div class="row">
@@ -45,12 +40,10 @@
                             </InputSelect>
                             <ValidationMessage For="@(() => Despacho.MenuId)" />
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <label> Centros Educativos: </label>
                             <InputSelect @bind-Value="Despacho.CentroEducativoId" class="form-select">
-                                <option value="0"  selected>Seleccione</option>
+                                <option value="0" selected>Seleccione</option>
                                 @foreach (var item in CentrosEducativos)
                                 {
                                     <option value="@item.CentroEducativoId">@item.Nombre</option>
@@ -58,9 +51,10 @@
                             </InputSelect>
                             <ValidationMessage For="@(() => Despacho.CentroEducativoId)" />
                         </div>
-                    </div>
+                    </div>                   
                     <br />
                     <fieldset>
+                        <div class="card">
                         <div class="card-header">
                             <h3>Comidas a despachar</h3>
                         </div>
@@ -68,6 +62,7 @@
                             <div class="col-md-6">
                                 <label> Comidas: </label>
                                 <InputSelect @bind-Value="DespachoDetalle.ComidaId" class="form-select">
+                                    <option value="0" selected>Seleccione</option>
                                     @foreach (var item in Comidas)
                                     {
                                         <option value="@item.ComidaId">@item.Descripcion</option>
@@ -96,9 +91,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Despacho Id</th>
                                             <th>Descripci&oacute;n</th>
-                                            <th>Comida Id</th>
                                             <th>Cantidad</th>
                                         </tr>
                                     </thead>
@@ -107,9 +100,7 @@
                                         @foreach (var item in this.Despacho.DespachoDetalles)
                                         {
                                             <tr>
-                                                <td>@item.DespachoId</td>
                                                 <td>@ObtenerDescripcionComida(item.ComidaId)</td>
-                                                <td>@item.ComidaId</td>
                                                 <td>@item.CantidadDecomida</td>
                                                 <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="bi bi-trash3-fill" /></button></td>
                                             </tr>
@@ -117,6 +108,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
                         </div>
                     </fieldset>
                     <br />
@@ -144,7 +136,7 @@
     public List<Menu> Menus { get; set; } = new List<Menu>(); //creo que las comidas debo de traerlas del menu y solo incrementar la cantidad o preguntarle a Enel si seria bueno que camias den el detalle se cambien por el menu
     public List<DespachoDetalle> DetallesEliminados { get; set; } = new();
     public List<DespachoDetalle> DetallesAgregado { get; set; } = new();
-
+    // public DateTime= Time { get; set;} = DateTime.Now;
     // public int id = 0;
 
     protected override async Task OnInitializedAsync()
@@ -177,7 +169,7 @@
 
     public async Task Guardar()
     {
-        if (await ValidarDetalleConMenu())
+        if (await ValidarDetalleConMenu() && ValidarHoraIngresada())
         {
             using var response = await httpClient.PostAsJsonAsync("api/Despachos", Despacho);
 
@@ -213,22 +205,26 @@
                         using var responseDetalleAgregado = await httpClient.PutAsJsonAsync<DespachoDetalle>($"api/Menus/{item.DetalleId}", item);
                     }
                 }
-
-                var mensaje = new NotificationMessage
-                    {
-                        Severity = NotificationSeverity.Success,
-                        Summary = "Guardado ",
-                        Detail = "Despacho guardado",
-                        Duration = 5_000
-                    };
-                notificationService.Notify(mensaje);
+                if ( await ValidarDetalleConMenu())
+                {
+                    var mensaje = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Success,
+                            Summary = "Guardado ",
+                            Detail = "Despacho guardado",
+                            Duration = 5_000
+                        };
+                    notificationService.Notify(mensaje);                   
+                }
                 Nuevo();
                 StateHasChanged();
             }
         }
         else
         {
-            var mensaje = new NotificationMessage
+            if(!await ValidarDetalleConMenu())
+            {
+                var mensaje = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
@@ -236,6 +232,8 @@
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
+            }
+         
         }
 
     }
@@ -307,43 +305,75 @@
     public void AgregarDetalle()
     {
         // if (DespachoDetalle.CantidadDecomida > 0)
-        var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula <= DespachoDetalle.CantidadDecomida;
-        var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
-        var VerificarComida = menuEncotrado!.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
-        if (VerificarCantidadComida && VerificarComida)
+        if (DespachoDetalle.ComidaId > 0 && validarEntradas()  )
         {
-            DespachoDetalle.DespachoId = Despacho.DespachoId;
-            Despacho.DespachoDetalles.Add(DespachoDetalle);
-            DetallesAgregado.Add(DespachoDetalle);
-            DespachoDetalle = new DespachoDetalle();
-            StateHasChanged();
+            var VerificarCantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula <= DespachoDetalle.CantidadDecomida;
+            var menuEncotrado = Menus.FirstOrDefault(m => m.MenuId == Despacho.MenuId);
+
+            var VerificarComida = menuEncotrado!.MenuDetalles.Any(md => md.ComidaId == DespachoDetalle.ComidaId);
+            if (VerificarCantidadComida && VerificarComida && ValidarCantidadComidaExcesiva())
+            {
+                DespachoDetalle.DespachoId = Despacho.DespachoId;
+                Despacho.DespachoDetalles.Add(DespachoDetalle);
+                DetallesAgregado.Add(DespachoDetalle);
+                DespachoDetalle = new DespachoDetalle();
+                StateHasChanged();
+            }
+            else
+            {
+                if (!VerificarCantidadComida)
+                {
+                    var mensaje = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Error,
+                            Summary = "Error ",
+                            Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula} raciones)",
+                            Duration = 5_000
+                        };
+                    notificationService.Notify(mensaje);
+                }
+
+                if (!VerificarComida)
+                {
+                    var mensaje = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Error,
+                            Summary = "Error ",
+                            Detail = $"{ObtenerDescripcionComida(DespachoDetalle.ComidaId)} no pertenece al menú",
+                            Duration = 5_000
+                        };
+                    notificationService.Notify(mensaje);
+                }
+            }
         }
         else
         {
-            if (!VerificarCantidadComida)
+            if(DespachoDetalle.ComidaId <= 0)
             {
                 var mensaje = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
-                        Detail = $"Debes de introducir la cantidad de comida suficiente para el Centro Educativo (Minimo {CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula} raciones)",
+                        Detail = "Debes de seleccionar una comida",
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
             }
 
-            if (!VerificarComida)
+
+            if(!validarEntradas())
             {
                 var mensaje = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
-                        Detail = $"{ObtenerDescripcionComida(DespachoDetalle.ComidaId)} no pertenece al menú",
+                        Detail = "Debes de seleccionar un Centro Educativo y un Menú",
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
             }
         }
+
         StateHasChanged();
     }
 
@@ -390,11 +420,58 @@
         foreach (var item in menu!.MenuDetalles)
         {
             var detalle = Despacho.DespachoDetalles.Any(md => md.ComidaId == item.ComidaId);
-           if (!detalle)
+            if (!detalle)
                 return false;
         }
         return true;
     }
+    public bool validarEntradas()
+    {
+        var validar = Despacho.CentroEducativoId > 0 && Despacho.MenuId > 0;      
+        return  validar;
+    }
+
     public bool Negacion(bool valor) => !valor;
+
+    public bool ValidarCantidadComidaExcesiva()
+    {
+        var cantidadComida = CentrosEducativos.FirstOrDefault(c => c.CentroEducativoId == Despacho.CentroEducativoId)!.CantidadMatricula;
+        var cantidadExcesiva = DespachoDetalle.CantidadDecomida >= (cantidadComida * 2);
+        if(cantidadExcesiva)
+        {
+            var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error ",
+                        Detail = $"Estás introduciendo más del doble de raciones de la cantidad requerida, revisa la cantidad que estás ingresando",
+                        Duration = 5_000
+                    };
+                notificationService.Notify(mensaje);
+        }
+        return Negacion(cantidadExcesiva);
+    }
+
+    private bool ValidarHora(string horaIngresada)
+    {
+        var horaActual = DateTime.Now.AddMinutes(-10).ToString("HH:mm");
+        return horaIngresada.CompareTo(horaActual) >= 0;
+    }
+    public bool ValidarHoraIngresada()
+    {
+        var horaIngresada = Despacho.Fecha.ToString("HH:mm");
+        var horaValida = ValidarHora(horaIngresada);
+        if(!horaValida)
+        {
+            var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error ",
+                        Detail = $"La hora ingresada no puede ser menor a la hora actual",
+                        Duration = 5_000
+                    };
+                notificationService.Notify(mensaje);
+        }
+        return horaValida;
+    }
    
 }
