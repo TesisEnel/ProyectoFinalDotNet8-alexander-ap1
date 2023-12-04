@@ -16,11 +16,16 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
+
                         <div class="col">
                             <label>Fecha: </label>
                             <InputDate @bind-Value="Despacho.Fecha" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")"
                                        max="@DateTime.Today.ToString("yyyy-MM-dd")"></InputDate>
-                            <ValidationMessage For="@(() => Despacho.Fecha)" />
+                            <ValidationMessage For="@(() => Despacho.Fecha)" />                          
+                        </div>
+                        <div class="col">
+                            <label>Hora: </label>
+                            <input type="time" id="PurchaseTime" name="PurchaseTime" @bind="Despacho.Fecha" class="form-control" />
                         </div>
                     </div>
                     <div class="row">
@@ -35,12 +40,10 @@
                             </InputSelect>
                             <ValidationMessage For="@(() => Despacho.MenuId)" />
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <label> Centros Educativos: </label>
                             <InputSelect @bind-Value="Despacho.CentroEducativoId" class="form-select">
-                                <option value="0"  selected>Seleccione</option>
+                                <option value="0" selected>Seleccione</option>
                                 @foreach (var item in CentrosEducativos)
                                 {
                                     <option value="@item.CentroEducativoId">@item.Nombre</option>
@@ -48,9 +51,10 @@
                             </InputSelect>
                             <ValidationMessage For="@(() => Despacho.CentroEducativoId)" />
                         </div>
-                    </div>
+                    </div>                   
                     <br />
                     <fieldset>
+                        <div class="card">
                         <div class="card-header">
                             <h3>Comidas a despachar</h3>
                         </div>
@@ -87,9 +91,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Despacho Id</th>
                                             <th>Descripci&oacute;n</th>
-                                            <th>Comida Id</th>
                                             <th>Cantidad</th>
                                         </tr>
                                     </thead>
@@ -98,9 +100,7 @@
                                         @foreach (var item in this.Despacho.DespachoDetalles)
                                         {
                                             <tr>
-                                                <td>@item.DespachoId</td>
                                                 <td>@ObtenerDescripcionComida(item.ComidaId)</td>
-                                                <td>@item.ComidaId</td>
                                                 <td>@item.CantidadDecomida</td>
                                                 <td><button type="button" class="btn btn-danger" @onclick=@(() => RemoveDatalle(item))><i class="bi bi-trash3-fill" /></button></td>
                                             </tr>
@@ -108,6 +108,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
                         </div>
                     </fieldset>
                     <br />
@@ -135,7 +136,7 @@
     public List<Menu> Menus { get; set; } = new List<Menu>(); //creo que las comidas debo de traerlas del menu y solo incrementar la cantidad o preguntarle a Enel si seria bueno que camias den el detalle se cambien por el menu
     public List<DespachoDetalle> DetallesEliminados { get; set; } = new();
     public List<DespachoDetalle> DetallesAgregado { get; set; } = new();
-
+    // public DateTime= Time { get; set;} = DateTime.Now;
     // public int id = 0;
 
     protected override async Task OnInitializedAsync()
@@ -168,7 +169,7 @@
 
     public async Task Guardar()
     {
-        if (await ValidarDetalleConMenu())
+        if (await ValidarDetalleConMenu() && ValidarHoraIngresada())
         {
             using var response = await httpClient.PostAsJsonAsync("api/Despachos", Despacho);
 
@@ -204,22 +205,26 @@
                         using var responseDetalleAgregado = await httpClient.PutAsJsonAsync<DespachoDetalle>($"api/Menus/{item.DetalleId}", item);
                     }
                 }
-
-                var mensaje = new NotificationMessage
-                    {
-                        Severity = NotificationSeverity.Success,
-                        Summary = "Guardado ",
-                        Detail = "Despacho guardado",
-                        Duration = 5_000
-                    };
-                notificationService.Notify(mensaje);
+                if ( await ValidarDetalleConMenu())
+                {
+                    var mensaje = new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Success,
+                            Summary = "Guardado ",
+                            Detail = "Despacho guardado",
+                            Duration = 5_000
+                        };
+                    notificationService.Notify(mensaje);                   
+                }
                 Nuevo();
                 StateHasChanged();
             }
         }
         else
         {
-            var mensaje = new NotificationMessage
+            if(!await ValidarDetalleConMenu())
+            {
+                var mensaje = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
                         Summary = "Error ",
@@ -227,6 +232,8 @@
                         Duration = 5_000
                     };
                 notificationService.Notify(mensaje);
+            }
+         
         }
 
     }
@@ -442,6 +449,29 @@
                 notificationService.Notify(mensaje);
         }
         return Negacion(cantidadExcesiva);
+    }
+
+    private bool ValidarHora(string horaIngresada)
+    {
+        var horaActual = DateTime.Now.AddMinutes(-10).ToString("HH:mm");
+        return horaIngresada.CompareTo(horaActual) >= 0;
+    }
+    public bool ValidarHoraIngresada()
+    {
+        var horaIngresada = Despacho.Fecha.ToString("HH:mm");
+        var horaValida = ValidarHora(horaIngresada);
+        if(!horaValida)
+        {
+            var mensaje = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error ",
+                        Detail = $"La hora ingresada no puede ser menor a la hora actual",
+                        Duration = 5_000
+                    };
+                notificationService.Notify(mensaje);
+        }
+        return horaValida;
     }
    
 }
