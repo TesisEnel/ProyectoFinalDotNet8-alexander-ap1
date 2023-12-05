@@ -113,3 +113,17 @@ https://github.com/AlexanderST01/ProyectoFinalWASM.git
 ![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/d90c803c-cc4e-4da8-b646-e52eb453f06c)
 
 ![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/ad05914b-575d-4bc9-9cdb-1bed44afcd42)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/5231bf5c-1810-4ac8-b1e9-0bcb9855f964)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/0a1f43d2-e881-4bd8-a55d-629b6bc366b1)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/cb221715-9968-4dbc-a857-d8b92631f1d0)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/d8a9fff3-d3ea-4c58-ab7a-58953046371a)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/9d61a6f5-d730-47a8-856c-1d8660bb1d2c)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/4bc6099b-cdc0-4b9f-a2d1-3934ad1ccf48)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/5047f143-099c-49b5-8c9c-fbf71d2b1d35)
