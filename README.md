@@ -92,3 +92,24 @@ Prueba.123
 
 #### Link del repositorio anterior en .Net 7 ####
 https://github.com/AlexanderST01/ProyectoFinalWASM.git
+
+## Fotos ## 
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/fb017e9f-af8f-4603-8985-bab5f65d5e25)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/bc771b92-c73a-43a1-a6b9-166d5a492fa0)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/8c09546c-367d-46cf-bc3b-c4b8668f5c66)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/335a9904-9a5f-49d3-9e09-c98eda9d1e09)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/d06d6757-6428-4973-9fac-da6c0a4c1db5)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/ae55d11e-8c35-4a1b-9638-a610266715d0)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/b56c06f0-e0b1-49b6-8fc8-62a62e5c97b8)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/7ce90008-f75c-4c40-9d2f-0bbb85cfefe5)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/d90c803c-cc4e-4da8-b646-e52eb453f06c)
+
+![image](https://github.com/AlexanderST01/ProyectoFinalDotNet8/assets/143297254/ad05914b-575d-4bc9-9cdb-1bed44afcd42)
