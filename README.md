@@ -59,6 +59,32 @@ e invitados obtengan una buena experiencia y se lleve una buena impresión de nu
 -Algo fundamental es suministrarles la formación requerida y correcta a los usuarios del 
 sistema, para así asegurarse de que puedan utilizar el sistema de manera eficiente y efectiva
 
+## Usuarios y claves: ##
+
+YokariaPrueba@gmail.com
+Yokaira.10
+
+Alexander@gmail.com
+Prueba.123
+
+Ronell@gmail.com
+Ronell.123
+
+Prueba@gmail.com
+Alexander.123
+
+Gregory@gmail.com
+Prueba.123
+
+Raysa@gmail.com
+Prueba.123
+
+Prueba@gmail.com
+Prueba.123
+
+Randy@gmail.com
+Prueba.123
+
 ## Desarrolladores: ##
 *Alexander Suárez Taveras (2021-0086)* 
 
